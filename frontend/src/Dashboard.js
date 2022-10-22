@@ -1,11 +1,13 @@
 import axios from 'axios';
 import './Dashboard.css';
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import useToken from './useToken';
 
 export default function Dashboard(props) {
+
+    const navigate = useNavigate();
 
     const { token, removeToken, setToken } = useToken();
     const [stockData, setStockData] = useState(null);
@@ -59,7 +61,7 @@ export default function Dashboard(props) {
                 res.access_token && props.setToken(res.access_token);
                 tempCurrPrices.push([currStock, res.toFixed(2)]);
                 tempCurrPriceSentence += currStock + ': ' + res.toFixed(2) + ' ';
-            })
+            });
         }
         //console.log(tempPrices);
         setStockPrice(tempPriceSentence);
@@ -75,7 +77,21 @@ export default function Dashboard(props) {
     }
 
     async function handleClick(event) {
-        console.log('button was clicked');
+        await axios({
+            method: "POST",
+            url: `/add-stock/${userID}/${newStock}/${newFrequency}`,
+        }).then((response) => {
+            const res = response.data;
+            res.access_token && props.setToken(res.access_token);
+            window.confirm('Stock has been added!');
+            window.location.reload();
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
         event.preventDefault();
     }
 
@@ -104,7 +120,7 @@ export default function Dashboard(props) {
                             <input type="text" onChange={e => setNewFrequency(e.target.value)} />
                         </label>
                         <div>
-                            <button type="submit" onClick={handleClick}>Add Stock</button>
+                            <button type="button" onClick={handleClick}>Add Stock</button>
                         </div>
                     </form>
                 </div>
