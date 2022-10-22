@@ -1,4 +1,5 @@
 from flask import Flask
+import yfinance as yf
 
 api = Flask(__name__)
 
@@ -10,3 +11,13 @@ def my_profile():
     }
 
     return response_body
+
+@api.route('/stock')
+def stock():
+    msft = yf.Ticker("MSFT")
+    response_body = msft.info
+
+    return response_body
+
+if __name__ == '__main__':
+    api.run(threaded=True, port=5000)

@@ -1,53 +1,36 @@
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 function App() {
 
-  const [profileData, setProfileData] = useState(null)
+  const [stockData, setStockData] = useState(null);
 
   function getData() {
     axios({
       method: "GET",
-      url:"/profile",
-    })
-    .then((response) => {
-      const res =response.data
-      setProfileData(({
-        profile_name: res.name,
-        about_me: res.about}))
-    }).catch((error) => {
-      if (error.response) {
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      }
-    })
+      url: "/stock",
+    }).then((response) => {
+      const res = response.data;
+      console.log(res);
+      setStockData(({
+        stock_name: res.longName,
+        dayHigh: res.dayHigh
+      }))
+    });
   }
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
 
-        <p>To get your profile details: </p><button onClick={getData}>Click me</button>
-        {profileData && <div>
-              <p>Profile name: {profileData.profile_name}</p>
-              <p>About me: {profileData.about_me}</p>
-            </div>
-        }
+        <p>To get your stock details: </p><button onClick={getData}>Click me</button>
+        {stockData && <div>
+          <p>Stock name: {stockData.stock_name}</p>
+          <p>Stock day high: {stockData.dayHigh}</p>
+        </div>}
 
       </header>
     </div>
