@@ -1,4 +1,5 @@
 import axios from 'axios';
+import './Dashboard.css';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from './Header';
@@ -11,9 +12,13 @@ export default function Dashboard(props) {
     const [stockPrice, setStockPrice] = useState([]);
     const [currStockPrice, setCurrStockPrice] = useState([]);
     const [priceChange, setPriceChange] = useState();
+
     const prevData = useLocation();
     const userID = prevData.state.currUsername;
     const userPass = prevData.state.currPassword;
+
+    const [newStock, setNewStock] = useState();
+    const [newFrequency, setNewFrequency] = useState();
 
     async function getData() {
         const first = await axios({
@@ -68,12 +73,17 @@ export default function Dashboard(props) {
         setPriceChange(tempPriceChangeSentence);
     }
 
+    async function handleClick(event) {
+        console.log('button was clicked');
+        event.preventDefault();
+    }
+
     return (
-        <div>
+        <div className="center">
             <header>
-                <h2>Dashboard</h2>
                 <p>Username was: {userID}</p>
                 <p>Password was: {userPass}</p>
+                <h2>Stock Portfolio</h2>
                 <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                 {stockData && <div>
                     <p>Stocks for {userID}: {stockData}</p>
@@ -81,6 +91,30 @@ export default function Dashboard(props) {
                     <p>Current stock price: {currStockPrice}</p>
                     <p>Percent change: {priceChange}</p>
                 </div>}
+                <div>
+                    <h2>Add Another Stock to Follow</h2>
+                    <form>
+                        <label>
+                            <p>Stock Name (4 Letter Abbreviation)</p>
+                            <input type="text" onChange={e => setNewStock(e.target.value)} />
+                        </label>
+                        <label>
+                            <p>Frequency (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)</p>
+                            <input type="text" onChange={e => setNewFrequency(e.target.value)} />
+                        </label>
+                        <div>
+                            <button type="submit" onClick={handleClick}>Add Stock</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <h2>Edit Stock Name or Frequency</h2>
+
+                </div>
+                <div>
+                    <h2>Stop Following a Stock</h2>
+
+                </div>
                 <Header token={removeToken} />
             </header>
         </div>
