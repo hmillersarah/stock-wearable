@@ -59,12 +59,14 @@ def stock():
     return response_body
 
 @api.route('/market')
-@jwt_required()
+#@jwt_required()
 def market():
     msft = yf.Ticker("MSFT")
-    response_body = msft.history(period="1mo")
-    print(response_body['Close'].max())
-    return str(response_body['Close'].max())
+    response_body = msft.history(period="1m")
+    # return the first close price (the value 1 month in the past)
+    return str(response_body['Close'].iloc[0])
+    #print(response_body['Close'].max())
+    #return str(response_body['Close'].max())
     #return response_body.to_json(orient='records')
 
 @api.route('/stock/<stockName>')
