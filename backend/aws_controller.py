@@ -19,3 +19,24 @@ def add_stock(user, stock, frequency):
         }
     )
     return response
+
+def delete_stock(user, stock):
+    response = dynamo_resource.delete_item(
+        Key={
+            "userID": user,
+            "stockName": stock
+        }
+    )
+    return response
+
+def update_stock(user, stock, newFreq):
+    response = dynamo_resource.update_item(
+        Key={
+            "userID": user,
+            "stockName": stock,
+        },
+        UpdateExpression="set frequency = :frequency",
+        ExpressionAttributeValues = {":frequency": newFreq},
+        ReturnValues = "UPDATED_NEW"
+    )
+    return response

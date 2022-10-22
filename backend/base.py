@@ -46,6 +46,16 @@ def add_stock(userID, stockName, stockFreq):
     response = aws_controller.add_stock(userID, stockName, stockFreq)
     return response
 
+@api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
+def delete_stock(userID, stockName):
+    response = aws_controller.delete_stock(userID, stockName)
+    return response
+
+@api.route('/update-stock/<userID>/<stock>/<newFreq>', methods=["PUT"])
+def update_stock(userID, stock, newFreq):
+    response = aws_controller.update_stock(userID, stock, newFreq)
+    return response
+
 @api.route('/profile')
 @jwt_required() 
 def my_profile():
