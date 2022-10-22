@@ -85,9 +85,10 @@ def marketCustom(stockName, freq):
     print(response_body['Close'].max())
     return str(response_body['Close'].max())
 
-@api.route('/get-items')
+@api.route('/get-stocks')
 def get_items():
-    return jsonify(aws_controller.get_user()["Items"])
+    return jsonify(aws_controller.get_stocks()["Items"])
+    # return jsonify(aws_controller.get_user()["Items"])
 
 @api.route("/logout", methods=["POST"])
 def logout():
