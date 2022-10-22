@@ -41,12 +41,9 @@ def create_token():
     response = {"access_token":access_token}
     return response
 
-@api.route('/add-stock', methods=["POST"])
-def add_stock():
-    user = request.json.get("email", None)
-    stock = request.json.get("stock", None)
-    frequency = request.json.get("frequency", None)
-    response = aws_controller.add_stock(user, stock, frequency)
+@api.route('/add-stock/<userID>/<stockName>/<stockFreq>', methods=["POST"])
+def add_stock(userID, stockName, stockFreq):
+    response = aws_controller.add_stock(userID, stockName, stockFreq)
     return response
 
 @api.route('/profile')

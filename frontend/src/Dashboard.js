@@ -32,6 +32,7 @@ export default function Dashboard(props) {
                 sentence = sentence + res[i][0] + ' ' + res[i][1] + ' ';
             }
             setStockData((sentence));
+            console.log(res);
             return res;
         });
         let tempPrices = [];
