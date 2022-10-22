@@ -15,31 +15,47 @@ export default function Dashboard(props) {
     function getData() {
         axios({
             method: "GET",
-            url: "/stock",
-            headers: {
-                Authorization: 'Bearer ' + props.token
-            }
+            url: `/get-stocks/${userID}`,
         }).then((response) => {
             const res = response.data;
             console.log(res);
             res.access_token && props.setToken(res.access_token);
-            setStockData(({
-                stock_name: res.longName,
-                dayHigh: res.dayHigh
-            }));
-
+            let sentence = '';
+            for (let i = 0; i < res.length; i++) {
+                sentence = sentence + res[i][0] + ' ' + res[i][1];
+            }
+            console.log(sentence)
+            setStockData((
+                sentence
+            ))
         });
+        // axios({
+        //     method: "GET",
+        //     url: "/stock",
+        //     headers: {
+        //         Authorization: 'Bearer ' + props.token
+        //     }
+        // }).then((response) => {
+        //     const res = response.data;
+        //     console.log(res);
+        //     res.access_token && props.setToken(res.access_token);
+        //     setStockData(({
+        //         stock_name: res.longName,
+        //         dayHigh: res.dayHigh
+        //     }));
 
-        axios({
-            method: "GET",
-            url: "/market",
-        }).then((response) => {
-            const res = response.data;
-            res.access_token && props.setToken(res.access_token)
-            setStockData(({
-                maxClose: res
-            }))
-        });
+        // });
+
+        // axios({
+        //     method: "GET",
+        //     url: "/market",
+        // }).then((response) => {
+        //     const res = response.data;
+        //     res.access_token && props.setToken(res.access_token)
+        //     setStockData(({
+        //         maxClose: res
+        //     }))
+        // });
     }
 
     return (
@@ -50,9 +66,10 @@ export default function Dashboard(props) {
                 <p>Password was: {userPass}</p>
                 <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                 {stockData && <div>
-                    <p>Stock name: {stockData.stock_name}</p>
+                    {/* <p>Stock name: {stockData.stock_name}</p>
                     <p>Stock day high: {stockData.dayHigh}</p>
-                    <p>Stock past 1 month max close: {stockData.maxClose}</p>
+                    <p>Stock past 1 month max close: {stockData.maxClose}</p> */}
+                    <p>Stock data: {stockData}</p>
                 </div>}
                 <Header token={removeToken} />
             </header>

@@ -34,7 +34,7 @@ def refresh_expiring_jwts(response):
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
+    if email != "test_user" or password != "test":
         return {"msg": "Wrong email or password"}, 401
 
     access_token = create_access_token(identity=email)
@@ -70,25 +70,34 @@ def market():
     #return str(response_body['Close'].max())
     #return response_body.to_json(orient='records')
 
+# get current price
 @api.route('/stock/<stockName>')
 def stockCustom(stockName):
     myStock = yf.Ticker(stockName)
-    response_body = myStock.info
+    response_body = str(myStock.info['currentPrice'])
     return response_body
 
-# DB function to get name of user stocks
+# retrieve past price
 @api.route('/market/<stockName>/<freq>')
-#@jwt_required()
 def marketCustom(stockName, freq):
     myStock = yf.Ticker(stockName)
     response_body = myStock.history(period=freq)
-    print(response_body['Close'].max())
     return str(response_body['Close'].max())
 
 @api.route('/get-stocks')
 def get_items():
     return jsonify(aws_controller.get_stocks()["Items"])
     # return jsonify(aws_controller.get_user()["Items"])
+
+@api.route('/get-stocks/<user>')
+def get_items_2(user):
+    userStocks = []
+    allStocks = aws_controller.get_stocks()["Items"]
+    for row in allStocks:
+        print(row['userID'])
+        if (row['userID']['S'] == user):
+            userStocks.append([row['stockName']['S'], row['frequency']['S']])
+    return userStocks
 
 @api.route("/logout", methods=["POST"])
 def logout():
