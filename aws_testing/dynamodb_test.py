@@ -19,6 +19,7 @@ user_table.put_item(
         "userID": userID,
         "password": "test_password",
         "device": False,
+        "deviceID": 123456,
         "numberOfStocks": 0
     }
 )
