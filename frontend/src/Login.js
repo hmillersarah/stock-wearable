@@ -22,7 +22,6 @@ export default function Login(props) {
             }
         })
             .then((response) => {
-                console.log(response.data.access_token);
                 props.setToken(response.data.access_token);
                 navigate('/dashboard', { state: { currUsername, currPassword } });
 
