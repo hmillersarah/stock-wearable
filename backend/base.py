@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 import yfinance as yf
 import json
+import aws_controller
 
 api = Flask(__name__)
 
@@ -66,6 +67,10 @@ def market():
     print(response_body['Close'].max())
     return str(response_body['Close'].max())
     #return response_body.to_json(orient='records')
+
+@api.route('/get-items')
+def get_items():
+    return jsonify(aws_controller.get_user()["Items"])
 
 @api.route("/logout", methods=["POST"])
 def logout():
