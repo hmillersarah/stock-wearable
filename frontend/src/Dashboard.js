@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export default function Dashboard() {
+export default function Dashboard(props) {
 
     const [stockData, setStockData] = useState(null);
     const prevData = useLocation();
@@ -13,9 +13,13 @@ export default function Dashboard() {
         axios({
             method: "GET",
             url: "/stock",
+            headers: {
+                Authorization: 'Bearer ' + props.token
+            }
         }).then((response) => {
             const res = response.data;
             console.log(res);
+            res.access_token && props.setToken(res.access_token);
             setStockData(({
                 stock_name: res.longName,
                 dayHigh: res.dayHigh
@@ -28,6 +32,7 @@ export default function Dashboard() {
             url: "/market",
         }).then((response) => {
             const res = response.data;
+            res.access_token && props.setToken(res.access_token)
             setStockData(({
                 maxClose: res
             }))
