@@ -1,4 +1,5 @@
 import axios from 'axios';
+import './Dashboard.css';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from './Header';
@@ -8,69 +9,112 @@ export default function Dashboard(props) {
 
     const { token, removeToken, setToken } = useToken();
     const [stockData, setStockData] = useState(null);
+    const [stockPrice, setStockPrice] = useState([]);
+    const [currStockPrice, setCurrStockPrice] = useState([]);
+    const [priceChange, setPriceChange] = useState();
+
     const prevData = useLocation();
     const userID = prevData.state.currUsername;
     const userPass = prevData.state.currPassword;
 
-    function getData() {
-        axios({
+    const [newStock, setNewStock] = useState();
+    const [newFrequency, setNewFrequency] = useState();
+
+    async function getData() {
+        const first = await axios({
             method: "GET",
             url: `/get-stocks/${userID}`,
         }).then((response) => {
             const res = response.data;
-            console.log(res);
             res.access_token && props.setToken(res.access_token);
             let sentence = '';
             for (let i = 0; i < res.length; i++) {
-                sentence = sentence + res[i][0] + ' ' + res[i][1];
+                sentence = sentence + res[i][0] + ' ' + res[i][1] + ' ';
             }
-            console.log(sentence)
-            setStockData((
-                sentence
-            ))
+            setStockData((sentence));
+            return res;
         });
-        // axios({
-        //     method: "GET",
-        //     url: "/stock",
-        //     headers: {
-        //         Authorization: 'Bearer ' + props.token
-        //     }
-        // }).then((response) => {
-        //     const res = response.data;
-        //     console.log(res);
-        //     res.access_token && props.setToken(res.access_token);
-        //     setStockData(({
-        //         stock_name: res.longName,
-        //         dayHigh: res.dayHigh
-        //     }));
+        let tempPrices = [];
+        let tempPriceSentence = '';
+        let tempCurrPrices = [];
+        let tempCurrPriceSentence = '';
+        for (let i = 0; i < first.length; i++) {
+            let currStock = first[i][0];
+            let currFreq = first[i][1];
+            const second = await axios({
+                method: "GET",
+                url: `/market/${currStock}/${currFreq}`,
+            }).then((response) => {
+                const res = response.data;
+                res.access_token && props.setToken(res.access_token);
+                tempPrices.push([currStock, res.toFixed(2)]);
+                tempPriceSentence += currStock + ': ' + res.toFixed(2) + ' ';
+            });
+            const third = await axios({
+                method: "GET",
+                url: `/stock/${currStock}`,
+            }).then((response) => {
+                const res = response.data;
+                res.access_token && props.setToken(res.access_token);
+                tempCurrPrices.push([currStock, res.toFixed(2)]);
+                tempCurrPriceSentence += currStock + ': ' + res.toFixed(2) + ' ';
+            })
+        }
+        //console.log(tempPrices);
+        setStockPrice(tempPriceSentence);
+        setCurrStockPrice(tempCurrPriceSentence);
+        let tempPriceChange = [];
+        let tempPriceChangeSentence = '';
+        for (let i = 0; i < tempCurrPrices.length; i++) {
+            let percent = (tempCurrPrices[i][1] - tempPrices[i][1]) / tempPrices[i][1] * 100;
+            tempPriceChange.push([tempCurrPrices[i][0], percent.toFixed(2)]);
+            tempPriceChangeSentence += tempCurrPrices[i][0] + ': ' + percent.toFixed(2) + ' ';
+        }
+        setPriceChange(tempPriceChangeSentence);
+    }
 
-        // });
-
-        // axios({
-        //     method: "GET",
-        //     url: "/market",
-        // }).then((response) => {
-        //     const res = response.data;
-        //     res.access_token && props.setToken(res.access_token)
-        //     setStockData(({
-        //         maxClose: res
-        //     }))
-        // });
+    async function handleClick(event) {
+        console.log('button was clicked');
+        event.preventDefault();
     }
 
     return (
-        <div>
+        <div className="center">
             <header>
-                <h2>Dashboard</h2>
                 <p>Username was: {userID}</p>
                 <p>Password was: {userPass}</p>
+                <h2>Stock Portfolio</h2>
                 <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                 {stockData && <div>
-                    {/* <p>Stock name: {stockData.stock_name}</p>
-                    <p>Stock day high: {stockData.dayHigh}</p>
-                    <p>Stock past 1 month max close: {stockData.maxClose}</p> */}
-                    <p>Stock data: {stockData}</p>
+                    <p>Stocks for {userID}: {stockData}</p>
+                    <p>Past stock price: {stockPrice}</p>
+                    <p>Current stock price: {currStockPrice}</p>
+                    <p>Percent change: {priceChange}</p>
                 </div>}
+                <div>
+                    <h2>Add Another Stock to Follow</h2>
+                    <form>
+                        <label>
+                            <p>Stock Name (4 Letter Abbreviation)</p>
+                            <input type="text" onChange={e => setNewStock(e.target.value)} />
+                        </label>
+                        <label>
+                            <p>Frequency (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)</p>
+                            <input type="text" onChange={e => setNewFrequency(e.target.value)} />
+                        </label>
+                        <div>
+                            <button type="submit" onClick={handleClick}>Add Stock</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <h2>Edit Stock Name or Frequency</h2>
+
+                </div>
+                <div>
+                    <h2>Stop Following a Stock</h2>
+
+                </div>
                 <Header token={removeToken} />
             </header>
         </div>
