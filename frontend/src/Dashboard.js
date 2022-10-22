@@ -22,9 +22,6 @@ export default function Dashboard(props) {
     const [newStock, setNewStock] = useState();
     const [newFrequency, setNewFrequency] = useState();
 
-    const [stockToEdit, setStockToEdit] = useState();
-    const [stockAfterEdit, setStockAfterEdit] = useState();
-
     const [stockWhoseFreqToEdit, setStockWhoseFreqToEdit] = useState();
     const [freqAfterEdit, setFreqAfterEdit] = useState();
 
@@ -103,10 +100,6 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
-    async function handleEditStock() {
-        console.log('button clicked');
-    }
-
     async function handleEditFreq() {
         console.log('freq button clicked');
     }
@@ -145,22 +138,7 @@ export default function Dashboard(props) {
                     </form>
                 </div>
                 <div>
-                    <h2>Edit Stock Name or Frequency</h2>
-                    <div>
-                        <form>
-                            <label>
-                                <p>Stock Name You Want to Change (Keep the Frequency)</p>
-                                <input type="text" onChange={e => setStockToEdit(e.target.value)} />
-                            </label>
-                            <label>
-                                <p>New Stock Name</p>
-                                <input type="text" onChange={e => setStockAfterEdit(e.target.value)} />
-                            </label>
-                            <div>
-                                <button type="button" onClick={handleEditStock}>Edit Stock</button>
-                            </div>
-                        </form>
-                    </div>
+                    <h2>Edit Stock Frequency</h2>
                     <div>
                         <form>
                             <label>
