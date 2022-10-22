@@ -1,9 +1,12 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import Header from './Header';
+import useToken from './useToken';
 
 export default function Dashboard(props) {
 
+    const { token, removeToken, setToken } = useToken();
     const [stockData, setStockData] = useState(null);
     const prevData = useLocation();
     const userID = prevData.state.currUsername;
@@ -51,7 +54,7 @@ export default function Dashboard(props) {
                     <p>Stock day high: {stockData.dayHigh}</p>
                     <p>Stock past 1 month max close: {stockData.maxClose}</p>
                 </div>}
-
+                <Header token={removeToken} />
             </header>
         </div>
     );
