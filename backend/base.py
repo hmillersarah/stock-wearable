@@ -67,6 +67,21 @@ def market():
     return str(response_body['Close'].max())
     #return response_body.to_json(orient='records')
 
+@api.route('/stock/<stockName>')
+def stockCustom(stockName):
+    myStock = yf.Ticker(stockName)
+    response_body = myStock.info
+    return response_body
+
+# DB function to get name of user stocks
+@api.route('/market/<stockName>/<freq>')
+#@jwt_required()
+def marketCustom(stockName, freq):
+    myStock = yf.Ticker(stockName)
+    response_body = myStock.history(period=freq)
+    print(response_body['Close'].max())
+    return str(response_body['Close'].max())
+
 @api.route("/logout", methods=["POST"])
 def logout():
     response = jsonify({"msg": "logout successful"})

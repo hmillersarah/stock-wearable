@@ -13,10 +13,6 @@ export default function Login(props) {
     async function handleClick(event) {
         const currUsername = username;
         const currPassword = password;
-        // navigate.push({
-        //     pathname: '/dashboard',
-        //     state: { username: currUsername, password: currPassword }
-        // });
         axios({
             method: "POST",
             url: "/token",
@@ -26,15 +22,20 @@ export default function Login(props) {
             }
         })
             .then((response) => {
-                props.setToken(response.data.access_token)
+                console.log(response.data.access_token);
+                props.setToken(response.data.access_token);
+                navigate('/dashboard', { state: { currUsername, currPassword } });
+
             }).catch((error) => {
                 if (error.response) {
-                    console.log(error.response)
-                    console.log(error.response.status)
-                    console.log(error.response.headers)
+                    console.log(error.response);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                    window.confirm('Incorrect username & password. Try again.');
+                    return Promise.reject(error);
                 }
             })
-        navigate('/dashboard', { state: { currUsername, currPassword } });
+        event.preventDefault();
     }
 
     return (
