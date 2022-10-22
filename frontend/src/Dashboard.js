@@ -22,6 +22,11 @@ export default function Dashboard(props) {
     const [newStock, setNewStock] = useState();
     const [newFrequency, setNewFrequency] = useState();
 
+    const [stockWhoseFreqToEdit, setStockWhoseFreqToEdit] = useState();
+    const [freqAfterEdit, setFreqAfterEdit] = useState();
+
+    const [stockToDelete, setStockToDelete] = useState();
+
     async function getData() {
         const first = await axios({
             method: "GET",
@@ -95,6 +100,14 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
+    async function handleEditFreq() {
+        console.log('freq button clicked');
+    }
+
+    async function handleDelete() {
+        console.log('delete button clicked');
+    }
+
     return (
         <div className="center">
             <header>
@@ -125,15 +138,39 @@ export default function Dashboard(props) {
                     </form>
                 </div>
                 <div>
-                    <h2>Edit Stock Name or Frequency</h2>
-
+                    <h2>Edit Stock Frequency</h2>
+                    <div>
+                        <form>
+                            <label>
+                                <p>Stock Whose Frequency You Want to Change</p>
+                                <input type="text" onChange={e => setStockWhoseFreqToEdit(e.target.value)} />
+                            </label>
+                            <label>
+                                <p>New Frequency</p>
+                                <input type="text" onChange={e => setFreqAfterEdit(e.target.value)} />
+                            </label>
+                            <div>
+                                <button type="button" onClick={handleEditFreq}>Edit Frequency</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div>
                     <h2>Stop Following a Stock</h2>
-
+                    <div>
+                        <form>
+                            <label>
+                                <p>Stock to Unfollow</p>
+                                <input type="text" onChange={e => setStockToDelete(e.target.value)} />
+                            </label>
+                            <div>
+                                <button type="button" onClick={handleDelete}>Unfollow Stock</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <Header token={removeToken} />
-            </header>
-        </div>
+            </header >
+        </div >
     );
 }
