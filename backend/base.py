@@ -97,7 +97,7 @@ def stockCustom(stockName):
 def marketCustom(stockName, freq):
     myStock = yf.Ticker(stockName)
     response_body = myStock.history(period=freq)
-    return str(response_body['Close'].max())
+    return str(response_body['Close'].iloc[0])
 
 @api.route('/get-stocks')
 def get_items():

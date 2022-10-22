@@ -23,7 +23,7 @@ export default function Dashboard(props) {
     const [newFrequency, setNewFrequency] = useState();
 
     const [stockWhoseFreqToEdit, setStockWhoseFreqToEdit] = useState();
-    const [freqAfterEdit, setFreqAfterEdit] = useState();
+    const [newFreqAfterEdit, setNewFreqAfterEdit] = useState();
 
     const [stockToDelete, setStockToDelete] = useState();
 
@@ -100,12 +100,42 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
-    async function handleEditFreq() {
-        console.log('freq button clicked');
+    async function handleEditFreq(event) {
+        await axios({
+            method: "PUT",
+            url: `/update-stock/${userID}/${stockWhoseFreqToEdit}/${newFreqAfterEdit}`,
+        }).then((response) => {
+            const res = response.data;
+            res.access_token && props.setToken(res.access_token);
+            window.confirm('Stock has been updated!');
+            window.location.reload();
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
     }
 
-    async function handleDelete() {
-        console.log('delete button clicked');
+    async function handleDelete(event) {
+        await axios({
+            method: "DELETE",
+            url: `/delete-stock/${userID}/${stockToDelete}`,
+        }).then((response) => {
+            const res = response.data;
+            res.access_token && props.setToken(res.access_token);
+            window.confirm('Stock has been deleted!');
+            window.location.reload();
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
     }
 
     return (
@@ -129,7 +159,7 @@ export default function Dashboard(props) {
                             <input type="text" onChange={e => setNewStock(e.target.value)} />
                         </label>
                         <label>
-                            <p>Frequency (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)</p>
+                            <p>Frequency (1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max)</p>
                             <input type="text" onChange={e => setNewFrequency(e.target.value)} />
                         </label>
                         <div>
@@ -147,7 +177,7 @@ export default function Dashboard(props) {
                             </label>
                             <label>
                                 <p>New Frequency</p>
-                                <input type="text" onChange={e => setFreqAfterEdit(e.target.value)} />
+                                <input type="text" onChange={e => setNewFreqAfterEdit(e.target.value)} />
                             </label>
                             <div>
                                 <button type="button" onClick={handleEditFreq}>Edit Frequency</button>
