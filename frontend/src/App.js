@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div>
-      <h1>Stock Wearable App</h1>
+      {/* <h1>Stock Wearable App</h1> */}
       <Routes>
         <Route exact path="/" element={<Login setToken={setToken} />} />
         <Route exact path="/dashboard" element={<Dashboard token={token} setToken={setToken} />} />

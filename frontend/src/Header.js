@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Button } from '@mui/material';
 
 function Header(props) {
 
@@ -24,9 +26,10 @@ function Header(props) {
 
     return (
         <header>
-            <button onClick={logMeOut}>
+            <Button color="inherit" onClick={logMeOut}>Logout</Button>
+            {/* <button onClick={logMeOut}>
                 Logout
-            </button>
+            </button> */}
         </header>
     )
 }
