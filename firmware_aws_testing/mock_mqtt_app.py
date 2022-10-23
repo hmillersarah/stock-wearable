@@ -36,8 +36,10 @@ client.connect(MQTT_SERVER, MQTT_PORT, 60)
 client.loop_start()
 
 while True:
-    request = input("Enter 1 to request device connection, or 2 to send up update, 3 to send down update: ")
-    if request == "1":
+    request = input("Enter 0 to disconnect, 1 to request device connection, 2 to send up update, 3 to send down update: ")
+    if request == "0":
+        client.publish(f"{DEVICE_ID}/connect", "disconnecting")
+    elif request == "1":
         client.publish(f"{DEVICE_ID}/connect", "requesting")
     elif request == "2":
         client.publish(f"{DEVICE_ID}/update", "MSFT,Up,242,240")

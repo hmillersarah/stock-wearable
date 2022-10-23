@@ -2,12 +2,10 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 #include "rgb_lcd.h"
+#include "pitches.h"
 
 // Debug flag for Serial printouts
 #define DEBUG true
-
-// RGB LCD Object
-rgb_lcd lcd;
 
 // WiFi SSID and Password
 const char* ssid = "BZhu iPhone";
@@ -47,6 +45,24 @@ static String stockName = "";
 static String upDown = "";
 static String prevValue = "";
 static String currValue = "";
+
+// RGB LCD Object
+rgb_lcd lcd;
+
+// Buzzer Setup
+#define BUZZER_PIN  15 // ESP32 pin GIOP15 connected to piezo buzzer
+int up_melody[] = {
+  NOTE_C4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_E5, NOTE_G5, NOTE_C6
+};
+double up_noteDurations[] = {
+  4, 4, 4, 4, 4, 4, 2
+};
+int down_melody[] = {
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_DS4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_D4,
+};
+double down_noteDurations[] = {
+  6, 6, 6, 1.5, 6, 6, 6, 1.5
+};
 
 void setup() {
   // Initialization
@@ -114,6 +130,12 @@ void callback(char* topic, byte* message, unsigned int length) {
   #endif
 
   String convertedTopic = String(topic);
+
+  // Disconnect device can occur anytime
+  if ((convertedTopic == DEVICE_ID + "/connect") && (messageTemp == "disconnecting")) {
+    state = DISCONNECTED;
+    connectedSubstate = IDLE;
+  }
 
   // State transition during app connection request
   if ((state == DISCONNECTED) && (convertedTopic == DEVICE_ID + "/connect") && (messageTemp == "requesting")) {
@@ -234,7 +256,17 @@ void loop() {
       lcd.print(prevValue + "->" + currValue);
       lcd.setRGB(0, 255, 0);
 
-      delay(3000);
+      // Buzz
+      for (int thisNote = 0; thisNote < 7; thisNote++) {
+        int noteDuration = 1000 / up_noteDurations[thisNote];
+        tone(BUZZER_PIN, up_melody[thisNote], noteDuration);
+
+        int pauseBetweenNotes = noteDuration * 1.30;
+        delay(pauseBetweenNotes);
+        noTone(BUZZER_PIN);
+      }
+
+      delay(2000);
 
       // Transition substate out
       connectedSubstate = IDLE;
@@ -248,7 +280,18 @@ void loop() {
       lcd.print(prevValue + "->" + currValue);
       lcd.setRGB(255, 0, 0);
 
-      delay(3000);
+      
+      // Buzz
+      for (int thisNote = 0; thisNote < 8; thisNote++) {
+        int noteDuration = 1000 / down_noteDurations[thisNote];
+        tone(BUZZER_PIN, down_melody[thisNote], noteDuration);
+
+        int pauseBetweenNotes = noteDuration * 1.30;
+        delay(pauseBetweenNotes);
+        noTone(BUZZER_PIN);
+      }
+
+      delay(2000);
 
       // Transition substate out
       connectedSubstate = IDLE;
