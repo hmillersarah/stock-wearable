@@ -31,30 +31,26 @@ def on_message(client, userdata, msg):
             print(f"Device {DEVICE_ID} is connected")
 
 client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
 
-client.connect(MQTT_SERVER, MQTT_PORT, 60)
-
-def track_stock(deviceid, stock, min_percent_change, interval, alert_int):
+def track_stock(stock, min_percent_change, interval, alert_int):
     print("started thread")
     while(1):
         yf_stock = yf.Ticker(stock)
         response_body = yf_stock.history(period=interval)
-        prev_val = response_body['Close'].iloc[0]
-        curr_val = response_body['Close'].iloc[len(response_body['Close'])]
-        percent_change = (curr_val - prev_val)/prev_val
+        prev_val = float(response_body['Close'].iloc[0])
+        curr_val = float(response_body['Close'].iloc[len(response_body['Close'])-1])
+        percent_change = (curr_val - prev_val)/prev_val * 100
         print("stock", stock, "percent change", percent_change)
         if percent_change >= min_percent_change:
-            client.publish(f"{DEVICE_ID}/update", f"{stock},Up,{prev_val},{curr_val}")
+            client.publish(f"{DEVICE_ID}/update", f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
         elif percent_change >= -1 * min_percent_change:
-            client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{prev_val},{curr_val}")
+            client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{curr_val:.2f},{prev_val:2f}")
         time.sleep(alert_int)
 
-def start_thread(userid, deviceid, stock, min_percent_change, interval, alert_int):
+def start_thread(userid, stock, min_percent_change, interval, alert_int):
     new_process = multiprocessing.Process(
         target=track_stock, 
-        args=(deviceid, stock, min_percent_change, interval, alert_int)
+        args=(stock, float(min_percent_change), interval, int(alert_int))
     )
     running[(userid, stock)] = new_process
     running_info[(userid, stock)] = {
@@ -91,12 +87,20 @@ def update_thread(userid, stock, **kwargs):
     running[(userid, stock)] = new_process
     new_process.start()
     
-def init_all_threads(all_stocks):
+def init_all_threads(all_stocks, deviceid):
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    global DEVICE_ID
+    DEVICE_ID = deviceid
+
+    client.connect(MQTT_SERVER, MQTT_PORT, 60)
     for row in all_stocks:
+        print(row)
         start_thread(
-            row['userID']['S'],
-            row['stockName']['S'],
-            row['percentChange']['S'],
-            row['frequency']['S'],
-            row['alertInterval']['S']
+            row['userID'],
+            row['stockName'],
+            row['percentChangeForAlert'],
+            row['frequency'],
+            row['checkInterval']
         )

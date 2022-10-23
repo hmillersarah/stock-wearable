@@ -40,7 +40,7 @@ def create_token():
     if email != "test_user" or password != "test":
         return {"msg": "Wrong email or password"}, 401
 
-    realtime_alert_threads.init_all_threads(aws_controller.get_stocks(email)["Items"])
+    realtime_alert_threads.init_all_threads(aws_controller.get_stocks(email)["Items"], aws_controller.get_device_id(email))
 
     access_token = create_access_token(identity=email)
     response = {"access_token":access_token}
@@ -49,7 +49,7 @@ def create_token():
 @api.route('/add-stock/<userID>/<stockName>/<stockFreq>/<percentChg>/<alertInt>', methods=["POST"])
 def add_stock(userID, stockName, stockFreq, percentChg, alertInt ):
     response = aws_controller.add_stock(userID, stockName, stockFreq, percentChg, alertInt)
-    realtime_alert_threads.start_thread(userID, aws_controller.get_device_id(userID), stockName, percentChg, stockFreq) 
+    realtime_alert_threads.start_thread(userID, stockName, percentChg, stockFreq) 
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
