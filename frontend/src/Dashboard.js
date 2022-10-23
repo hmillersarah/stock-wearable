@@ -41,12 +41,12 @@ export default function Dashboard(props) {
     const [selectionModel, setSelectionModel] = useState();
     const columns = [
         { field: 'stock', headerName: 'Stock', width: 70 },
-        { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 300 },
+        { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 250 },
         { field: 'past', headerName: 'Past Price', type: "number", width: 130 },
         { field: 'curr', headerName: 'Current Price', type: "number", width: 130 },
-        { field: 'percent', headerName: 'Stock Price Percent Change', type: "number", width: 300 },
-        { field: 'percentChangeForAlert', headerName: 'Percent Change for Alert', type: "number", width: 350 },
-        { field: 'checkInterval', headerName: 'Check Interval', type: "number", width: 250 },
+        { field: 'percent', headerName: 'Stock Price Percent Change', type: "number", width: 250 },
+        { field: 'percentChangeForAlert', headerName: 'Percent Change for Alert', type: "number", width: 250 },
+        { field: 'checkInterval', headerName: 'Check Interval', type: "number", width: 200 },
     ]
 
     const [stockTable, setStockTable] = useState([]);
@@ -549,11 +549,11 @@ export default function Dashboard(props) {
                                     columns={columns}
                                     pageSize={5}
                                     rowsPerPageOptions={[5]}
-                                    checkboxSelection
-                                    onSelectionModelChange={(newSelection) => {
-                                        setSelectionModel(newSelection.selectionModel);
-                                    }}
-                                    selectionModel={selectionModel}
+                                // checkboxSelection
+                                // onSelectionModelChange={(newSelection) => {
+                                //     setSelectionModel(newSelection.selectionModel);
+                                // }}
+                                // selectionModel={selectionModel}
                                 />
                             </div>
                             {/* {selectionModel.map(val => <h1>{val}</h1>)} */}
