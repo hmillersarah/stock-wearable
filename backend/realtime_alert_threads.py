@@ -10,6 +10,7 @@ DEVICE_ID   = 123456
 
 running = {}
 running_info = {}
+is_device_connected = False
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -19,16 +20,19 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    global is_device_connected
     # This topic is the only one subscribed to but just in case (should be unneeded)
     if msg.topic == f"{DEVICE_ID}/connect":
 
         message = str(msg.payload.decode("utf-8"))
         if message == "disconnected":
             print(f"Device {DEVICE_ID} is disconnected")
+            is_device_connected = False
         elif message == "requesting":
             print("App is requesting device connection")
         elif message == "connected":
             print(f"Device {DEVICE_ID} is connected")
+            is_device_connected = True
 
 
 def track_stock(stock, min_percent_change, interval, alert_int):

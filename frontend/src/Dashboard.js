@@ -41,7 +41,8 @@ export default function Dashboard(props) {
 
     const { token, removeToken, setToken } = useToken();
 
-    const [selectionModel, setSelectionModel] = useState();
+    const [connectivityStatus, setConnectivityStatus] = useState('Waiting on Connection');
+
     const columns = [
         { field: 'stock', headerName: 'Stock', width: 70 },
         { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 250 },
@@ -174,6 +175,13 @@ export default function Dashboard(props) {
             //     url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
             // });
         }
+        await axios({
+            method: "GET",
+            url: `device-status/${userID}`,
+        }).then((response) => {
+            const res = response.data;
+            setConnectivityStatus(res);
+        });
     }
 
     async function handleClick(event) {
@@ -271,9 +279,41 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
+    async function connectToDevice(event) {
+        await axios({
+            method: "GET",
+            url: `/device-connect/${userID}/requesting`,
+        }).then((response) => {
+            const res = response.data;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
+    }
+
+    async function disconnectFromDevice(event) {
+        await axios({
+            method: "GET",
+            url: `/device-connect/${userID}/disconnecting`,
+        }).then((response) => {
+            const res = response.data;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
+    }
+
     useEffect(() => {
         getData();
-    }, [stockTableFinished]);
+    }, [stockTableFinished, connectivityStatus]);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -293,6 +333,9 @@ export default function Dashboard(props) {
                     <Typography variant="h2">
                         Welcome, {userID}
                     </Typography>
+                    <Typography variant="h5">
+                        Connection Status: {connectivityStatus}
+                    </Typography>
                 </Grid>
                 <Grid
                     container
@@ -301,275 +344,283 @@ export default function Dashboard(props) {
                     justify="flex-start"
                     alignItems="flex-start"
                 >
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Add a Stock
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Add a stock to your portfolio to get alerts for price changes
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                        <Button variant="outlined" onClick={handleClickOpenAdd}>
-                        Add Stock
-                            </Button>
-                            <Dialog open={open} onClose={handleCloseAdd}>
-                                <DialogTitle>Subscribe to a Stock</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Add a new stock to your portfolio...
-                                    </DialogContentText>
-                                    <TextField
-                                        margin='dense'
-                                        id='stockName'
-                                        label='Stock Name'
-                                        fullWidth
-                                        variant="standard"
-                                        type="text"
-                                        helperText="Official abbreviation only"
-                                        onChange={e => setNewStock(e.target.value)}
-                                    />
-                                    <TextField
-                                        margin='dense'
-                                        id='pastPrice'
-                                        label='Baseline Comparison Date'
-                                        fullWidth
-                                        variant="standard"
-                                        type="text"
-                                        helperText="(1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"
-                                        onChange={e => setNewFrequency(e.target.value)}
-                                    />
-                                    <TextField
-                                        margin='dense'
-                                        id='priceCheckInterval'
-                                        label='Minimum Percent Change for Alerts'
-                                        fullWidth
-                                        variant="standard"
-                                        type="text"
-                                        helperText="Price change to warrant alert on wearable device"
-                                        onChange={e => setNewAlert(e.target.value)}
-                                    />
-                                    <TextField
-                                        margin='dense'
-                                        id='priceCheckInterval'
-                                        label='Price Change Check Interval'
-                                        fullWidth
-                                        variant="standard"
-                                        type="text"
-                                        helperText="(seconds)"
-                                        onChange={e => setNewPercentChange(e.target.value)}
-                                    />
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleCloseAdd}>Cancel</Button>
-                                    <Button onClick={handleClick}>Subscribe</Button>
-                                </DialogActions>
-                            </Dialog>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Add a Stock
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Add a stock to your portfolio to get alerts for price changes
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={handleClickOpenAdd}>
+                                    Add Stock
+                                </Button>
+                                <Dialog open={open} onClose={handleCloseAdd}>
+                                    <DialogTitle>Subscribe to a Stock</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Add a new stock to your portfolio...
+                                        </DialogContentText>
+                                        <TextField
+                                            margin='dense'
+                                            id='stockName'
+                                            label='Stock Name'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Official abbreviation only"
+                                            onChange={e => setNewStock(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='pastPrice'
+                                            label='Baseline Comparison Date'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="(1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"
+                                            onChange={e => setNewFrequency(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='priceCheckInterval'
+                                            label='Minimum Percent Change for Alerts'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Price change to warrant alert on wearable device"
+                                            onChange={e => setNewAlert(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='priceCheckInterval'
+                                            label='Price Change Check Interval'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="(seconds)"
+                                            onChange={e => setNewPercentChange(e.target.value)}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseAdd}>Cancel</Button>
+                                        <Button onClick={handleClick}>Subscribe</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </CardActions>
+                        </Card>
+                    </Grid>
 
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Unfollow a Stock
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Remove a stock from your portfolio to make room for new ones
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button variant="outlined" onClick={handleClickOpenDelete}>
-                                Delete
-                            </Button>
-                            <Dialog open={openDeleteStock} onClose={handleCloseDelete}>
-                                <DialogTitle>Unfollow Stock</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Please confirm the stock you would like to remove from your portfolio:
-                                    </DialogContentText>
-                                    <TextField
-                                    margin='dense'
-                                    id='deleteStock'
-                                    label='Stock Name'
-                                    fullWidth
-                                    variant="standard"
-                                    type="text"
-                                    helperText="Type the stock you would like to unfollow"
-                                    onChange={e => setStockToDelete(e.target.value)}
-                                    />    
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleCloseDelete}>Cancel</Button>
-                                    <Button onClick={handleDelete}>Unfollow</Button>
-                                </DialogActions>                
-                            </Dialog>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Unfollow a Stock
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Remove a stock from your portfolio to make room for new ones
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={handleClickOpenDelete}>
+                                    Delete
+                                </Button>
+                                <Dialog open={openDeleteStock} onClose={handleCloseDelete}>
+                                    <DialogTitle>Unfollow Stock</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Please confirm the stock you would like to remove from your portfolio:
+                                        </DialogContentText>
+                                        <TextField
+                                            margin='dense'
+                                            id='deleteStock'
+                                            label='Stock Name'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Type the stock you would like to unfollow"
+                                            onChange={e => setStockToDelete(e.target.value)}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseDelete}>Cancel</Button>
+                                        <Button onClick={handleDelete}>Unfollow</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </CardActions>
+                        </Card>
+                    </Grid>
 
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Edit Baseline Date
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Change the starting point for price comparison to indicate significant price change
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                        <Button variant="outlined" onClick={handleClickOpenEditStockBaseline}>
-                            Edit Baseline Date
-                        </Button>
-                        <Dialog open={openEditStockBaseline} onClose={handleCloseEditStockBaseline}>
-                            <DialogTitle>Edit Baseline Date</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Update the baseline date of your stock
-                                </DialogContentText>
-                                <TextField
-                                margin='dense'
-                                id='baselinePriceStock'
-                                label='Stock Name'
-                                fullWidth
-                                variant="standard"
-                                type="text"
-                                helperText="Target Stock for New Baseline Comparison Date"
-                                onChange={e => setStockToEdit(e.target.value)}
-                                />    
-                                <TextField
-                                margin='dense'
-                                id='baselinePrice'
-                                label='New Baseline Comparison Date'
-                                fullWidth
-                                variant="standard"
-                                type="text"
-                                helperText="(1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"
-                                onChange={e => setNewFreqAfterEdit(e.target.value)}
-                                />    
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleCloseEditStockBaseline}>Cancel</Button>
-                                <Button onClick={handleEditFreq}>Edit</Button>
-                            </DialogActions>                
-                        </Dialog>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Edit Baseline Date
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Change the starting point for price comparison to indicate significant price change
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={handleClickOpenEditStockBaseline}>
+                                    Edit Baseline Date
+                                </Button>
+                                <Dialog open={openEditStockBaseline} onClose={handleCloseEditStockBaseline}>
+                                    <DialogTitle>Edit Baseline Date</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Update the baseline date of your stock
+                                        </DialogContentText>
+                                        <TextField
+                                            margin='dense'
+                                            id='baselinePriceStock'
+                                            label='Stock Name'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Target Stock for New Baseline Comparison Date"
+                                            onChange={e => setStockToEdit(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='baselinePrice'
+                                            label='New Baseline Comparison Date'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="(1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"
+                                            onChange={e => setNewFreqAfterEdit(e.target.value)}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseEditStockBaseline}>Cancel</Button>
+                                        <Button onClick={handleEditFreq}>Edit</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </CardActions>
+                        </Card>
+                    </Grid>
 
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Edit Stock Percent Change
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Change the starting point for price comparison to indicate significant price change
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button variant="outlined" onClick={handleClickOpenEditMinPercentChg}>
-                                Edit Stock Percent Change
-                            </Button>
-                            <Dialog open={openEditMinPercentChg} onClose={handleCloseEditMinPercentChg}>
-                                <DialogTitle>Edit Stock Percent Change</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Update minimum stock percent change needed to warrant alert
-                                    </DialogContentText>
-                                    <TextField
-                                    margin='dense'
-                                    id='minPercentChgStock'
-                                    label='Stock Name'
-                                    fullWidth
-                                    variant="standard"
-                                    type="text"
-                                    helperText="Target Stock for New Percent Change"
-                                    onChange={e => setStockToEdit(e.target.value)}
-                                    />    
-                                    <TextField
-                                    margin='dense'
-                                    id='minPercentChg'
-                                    label='New Minimum Percent Change'
-                                    fullWidth
-                                    variant="standard"
-                                    type="text"
-                                    onChange={e => setNewPercentChangeAfterEdit(e.target.value)}
-                                    />    
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleCloseEditMinPercentChg}>Cancel</Button>
-                                    <Button onClick={handleEditPercentChange}>Edit</Button>
-                                </DialogActions>                
-                            </Dialog>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Edit Stock Percent Change
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Change the starting point for price comparison to indicate significant price change
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={handleClickOpenEditMinPercentChg}>
+                                    Edit Stock Percent Change
+                                </Button>
+                                <Dialog open={openEditMinPercentChg} onClose={handleCloseEditMinPercentChg}>
+                                    <DialogTitle>Edit Stock Percent Change</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Update minimum stock percent change needed to warrant alert
+                                        </DialogContentText>
+                                        <TextField
+                                            margin='dense'
+                                            id='minPercentChgStock'
+                                            label='Stock Name'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Target Stock for New Percent Change"
+                                            onChange={e => setStockToEdit(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='minPercentChg'
+                                            label='New Minimum Percent Change'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            onChange={e => setNewPercentChangeAfterEdit(e.target.value)}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseEditMinPercentChg}>Cancel</Button>
+                                        <Button onClick={handleEditPercentChange}>Edit</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </CardActions>
+                        </Card>
+                    </Grid>
 
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Edit Check Interval
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Update seconds interval at which stock price changes are checked
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                        <Button variant="outlined" onClick={handleClickOpenEditCheckInt}>
-                            Edit Check Interval
-                        </Button>
-                        <Dialog open={openEditCheckInt} onClose={handleCloseEditCheckInt}>
-                            <DialogTitle>Edit Price Check Interval</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Update interval at which stock price changes are checked
-                                </DialogContentText>
-                                <TextField
-                                margin='dense'
-                                id='checkIntStock'
-                                label='Stock Name'
-                                fullWidth
-                                variant="standard"
-                                type="text"
-                                helperText="Target Stock for New Price Change Check Interval"
-                                onChange={e => setStockToEdit(e.target.value)}
-                                />    
-                                <TextField
-                                margin='dense'
-                                id='newCheckInt'
-                                label='New Price Change Check Interval'
-                                fullWidth
-                                variant="standard"
-                                type="text"
-                                onChange={e => setNewAlertAfterEdit(e.target.value)}
-                                />    
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleCloseEditCheckInt}>Cancel</Button>
-                                <Button onClick={handleEditAlert}>Edit</Button>
-                            </DialogActions>                
-                        </Dialog>
-                        </CardActions>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5">
-                                Wear Your Wearable
-                            </Typography>
-                            <Typography variant="body1"  color="text.secondary">
-                                Remember to wear your wearable to get customized real-time stock portfolio alerts on your wrist so you never miss a stock rise or drop again! 
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Edit Check Interval
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Update seconds interval at which stock price changes are checked
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={handleClickOpenEditCheckInt}>
+                                    Edit Check Interval
+                                </Button>
+                                <Dialog open={openEditCheckInt} onClose={handleCloseEditCheckInt}>
+                                    <DialogTitle>Edit Price Check Interval</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Update interval at which stock price changes are checked
+                                        </DialogContentText>
+                                        <TextField
+                                            margin='dense'
+                                            id='checkIntStock'
+                                            label='Stock Name'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            helperText="Target Stock for New Price Change Check Interval"
+                                            onChange={e => setStockToEdit(e.target.value)}
+                                        />
+                                        <TextField
+                                            margin='dense'
+                                            id='newCheckInt'
+                                            label='New Price Change Check Interval'
+                                            fullWidth
+                                            variant="standard"
+                                            type="text"
+                                            onChange={e => setNewAlertAfterEdit(e.target.value)}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseEditCheckInt}>Cancel</Button>
+                                        <Button onClick={handleEditAlert}>Edit</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    Connect to Device
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Connect or disconnect from your wearable device
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={connectToDevice}>
+                                    Connect
+                                </Button>
+                                <Button variant="outlined" onClick={disconnectFromDevice}>
+                                    Disconnect
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
                 </Grid>
 
                 {/* <div>
@@ -592,24 +643,24 @@ export default function Dashboard(props) {
                     </div> */}
 
             </Container>
-            <Container >
-                <Box style={{marginTop: 30, padding: 10, backgroundColor: "#1976d3"}}>
-                <Typography variant="h4" component="div" color="white" sx={{ flexGrow: 1, paddingTop: 5, paddingLeft: 5 }}>
-                    Stock Portfolio
-                </Typography>
-                <Typography variant="body1" color="white" sx={{ paddingLeft: 5 }}>
-                    Please wait a few seconds to view stock details.
-                </Typography>
+            <Container>
+                <Box style={{ marginTop: 30, padding: 10, backgroundColor: "#1976d3" }}>
+                    <Typography variant="h4" component="div" color="white" sx={{ flexGrow: 1, paddingTop: 5, paddingLeft: 5 }}>
+                        Stock Portfolio
+                    </Typography>
+                    <Typography variant="body1" color="white" sx={{ paddingLeft: 5 }}>
+                        Please wait a few seconds to view stock details.
+                    </Typography>
                 </Box>
-                    {/* <p>Username was: {userID}</p>
+                {/* <p>Username was: {userID}</p>
                     <p>Password was: {userPass}</p> */}
-                    {/* <p>Username was: {userID}</p>
+                {/* <p>Username was: {userID}</p>
                     <p>Password was: {userPass}</p>
                     <h2>Stock Portfolio</h2> */}
-                    {/* <p>Wait a few seconds to view stock details.</p> */}
+                {/* <p>Wait a few seconds to view stock details.</p> */}
+                <div>
                     <div>
-                        <div>
-                            {/* <TableContainer component={Paper}>
+                        {/* <TableContainer component={Paper}>
                                 <Table sx={{ width: 3 / 4 }} aria-label="simple table">
                                     <TableHead>
                                         <TableRow>
@@ -638,24 +689,24 @@ export default function Dashboard(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainer> */}
-                            <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto', backgroundColor: "white" }}>
-                                <DataGrid
-                                    getRowId={(row) => row.stock}
-                                    rows={stockTable}
-                                    columns={columns}
-                                    pageSize={5}
-                                    rowsPerPageOptions={[5]}
-                                // checkboxSelection
-                                // onSelectionModelChange={(newSelection) => {
-                                //     setSelectionModel(newSelection.selectionModel);
-                                // }}
-                                // selectionModel={selectionModel}
-                                />
-                            </div>
-                            {/* {selectionModel.map(val => <h1>{val}</h1>)} */}
+                        <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto', backgroundColor: "white" }}>
+                            <DataGrid
+                                getRowId={(row) => row.stock}
+                                rows={stockTable}
+                                columns={columns}
+                                pageSize={5}
+                                rowsPerPageOptions={[5]}
+                            // checkboxSelection
+                            // onSelectionModelChange={(newSelection) => {
+                            //     setSelectionModel(newSelection.selectionModel);
+                            // }}
+                            // selectionModel={selectionModel}
+                            />
                         </div>
+                        {/* {selectionModel.map(val => <h1>{val}</h1>)} */}
                     </div>
-                    {/* <h2>Stock Portfolio</h2>
+                </div>
+                {/* <h2>Stock Portfolio</h2>
                     <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                     {stockData && <div>
                         <p>Stocks for {userID}: {stockData}</p>
@@ -663,7 +714,7 @@ export default function Dashboard(props) {
                         <p>Current stock price: {currStockPrice}</p>
                         <p>Percent change: {priceChange}</p>
                     </div>} */}
-                    {/* <div>
+                {/* <div>
                         <h2>Add Another Stock to Follow</h2>
                         <form>
                             <label>
@@ -687,7 +738,7 @@ export default function Dashboard(props) {
                             </div>
                         </form>
                     </div> */}
-                    {/* <div>
+                {/* <div>
                         <h2>Edit Stock Baseline Comparison Date</h2>
                         <div>
                             <form>
@@ -705,7 +756,7 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div> */}
-                    {/* <div>
+                {/* <div>
                         <h2>Edit Stock Minimum Percent Change to Warrant an Alert</h2>
                         <div>
                             <form>
@@ -723,7 +774,7 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div> */}
-                    {/* <div>
+                {/* <div>
                         <h2>Edit Stock Check Interval</h2>
                         <form>
                             <label>
@@ -739,7 +790,7 @@ export default function Dashboard(props) {
                             </div>
                         </form>
                     </div> */}
-                    {/* <div>
+                {/* <div>
                         <h2>Edit Stock Alert Interval</h2>
                         <div>
                             <form>
@@ -757,7 +808,7 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div> */}
-{/* 
+                {/* 
                     <div>
                         <h2>Stop Following a Stock</h2>
                         <div>
@@ -772,7 +823,7 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div> */}
-                    {/* <Header token={removeToken} /> */}
+                {/* <Header token={removeToken} /> */}
             </Container>
         </Box>
     );

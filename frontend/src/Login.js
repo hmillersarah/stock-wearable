@@ -2,7 +2,7 @@ import { React, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
-import { Container, Card, CardContent, Divider, Typography, TextField, Button, Grid, Box } from '@mui/material';
+import { Container, Card, CardContent, Stack, Typography, TextField, Button, Grid, Box } from '@mui/material';
 
 
 export default function Login(props) {
@@ -40,7 +40,7 @@ export default function Login(props) {
     }
 
     return (
-        <Container sx={{ flexGrow: 1, width: "100%" }}>
+        <Container class="background" sx={{ flexGrow: 1, width: "100%" }}>
             <Box
                 container
                 display="flex"
@@ -50,13 +50,15 @@ export default function Login(props) {
                 alignItems="center"
                 minHeight="100vh"
             >
+            <Stack>
             <Grid item xs={4}>
-                <Typography variant="h1" component="div" sx={{ flexGrow: 1, fontSize: "100px" }}>
+                <Typography variant="h1" component="div" sx={{ flexGrow: 1, fontSize: "90px", paddingRight: 5 }}>
                     No Stocks Left Behind
                 </Typography>
             </Grid>
+            </Stack>
             <Grid item xs={4}>
-            <Card >
+            <Card>
                 <CardContent>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Log In
@@ -82,7 +84,7 @@ export default function Login(props) {
                         onChange={e => setPassword(e.target.value)}
                         /> 
                     {/* <Divider sx={{padding: 3}} /> */}
-                    <Button onClick={handleClick} variant={"outlined"} sx={{marginTop: 3}}>
+                    <Button onClick={handleClick} variant={"outlined"} size="large" sx={{marginTop: 3}}>
                         Login
                     </Button>
                 </CardContent>

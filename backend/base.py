@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 import yfinance as yf
 import json
+import time
 import aws_controller
 import realtime_alert_threads
 
@@ -144,6 +145,31 @@ def logout():
     response = jsonify({"msg": "logout successful"})
     unset_jwt_cookies(response)
     return response
+
+@api.route("/device-status/<userID>")
+def display_device_status(userID):
+    deviceID = aws_controller.get_device_id(userID)
+    while realtime_alert_threads.is_device_connected == False or deviceID != realtime_alert_threads.DEVICE_ID:
+        time.sleep(0.1)
+    return str("connected")
+
+@api.route("/device-connect/<userID>/<payload>")
+def device_request_connect(userID, payload):
+    # payload is either the string "requesting" or "disconnecting" to connect or disconnect to device
+    deviceID = aws_controller.get_device_id(userID)
+    import paho.mqtt.client as mqtt
+
+    MQTT_SERVER = "ec2-54-224-178-151.compute-1.amazonaws.com"
+    MQTT_PORT   = 1883
+
+    client = mqtt.Client()
+    client.connect(MQTT_SERVER, MQTT_PORT, 60)
+
+    # Non-blocking call
+    client.loop_start()
+    client.publish(f"{deviceID}/connect", payload)
+    client.loop_stop()
+
 
 if __name__ == '__main__':
     api.run(threaded=True, port=5000)
