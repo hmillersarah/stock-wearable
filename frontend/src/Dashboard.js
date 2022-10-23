@@ -81,6 +81,10 @@ export default function Dashboard(props) {
             let percent = (tempCurrPrices[i][1] - tempPrices[i][1]) / tempPrices[i][1] * 100;
             tempPriceChange.push([tempCurrPrices[i][0], percent.toFixed(2)]);
             tempPriceChangeSentence += tempCurrPrices[i][0] + ': ' + percent.toFixed(2) + ' ';
+            const fourth = await axios({
+                method: "PUT",
+                url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
+            });
         }
         setPriceChange(tempPriceChangeSentence);
     }

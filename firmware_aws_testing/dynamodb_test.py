@@ -28,7 +28,10 @@ stock_table.put_item(
     Item={
         "userID": userID,
         "stockName": "MSFT",
-        "frequency": "1mo"
+        "frequency": "10y",
+        "percentChangeForAlert": 40,
+        "checkInterval": 60,
+        "stockPricePercentChange": 0
     }
 )
 
@@ -36,6 +39,9 @@ stock_table.put_item(
     Item={
         "userID": userID,
         "stockName": "AMZN",
-        "frequency": "3mo"
+        "frequency": "3mo",
+        "percentChangeForAlert": 30,
+        "checkInterval": 100,
+        "stockPricePercentChange": 0
     }
 )
