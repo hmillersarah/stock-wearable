@@ -87,7 +87,9 @@ def update_thread(userid, stock, **kwargs):
         args=(
             stock, 
             float(running_info[(userid, stock)]["min_percent_change"]), 
-            running_info[(userid, stock)]["interval"])
+            running_info[(userid, stock)]["interval"],
+            int(running_info[(userid, stock)]["alert_int"])
+        )
     )
     running[(userid, stock)] = new_process
     new_process.start()
