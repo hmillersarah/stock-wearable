@@ -1,28 +1,36 @@
 import axios from 'axios';
 import './Dashboard.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import useToken from './useToken';
 import Box from '@mui/material/Box';
-import { 
-    AppBar, 
-    Toolbar, 
-    Typography, 
-    Container, 
-    Grid, 
-    Dialog, 
-    Button, 
-    DialogTitle, 
-    DialogContent, 
-    DialogContentText, 
-    DialogActions, 
-    TextField 
+import {
+    AppBar,
+    Toolbar,
+    Typography,
+    Container,
+    Grid,
+    Dialog,
+    Button,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    TextField
 } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 
 export default function Dashboard(props) {
 
@@ -30,8 +38,16 @@ export default function Dashboard(props) {
 
     const { token, removeToken, setToken } = useToken();
 
+    const columns = [
+        { field: 'stock', headerName: 'Stock', width: 70 },
+        { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 300 },
+        { field: 'past', headerName: 'Past Price', type: "number", width: 130 },
+        { field: 'curr', headerName: 'Current Price', type: "number", width: 130 },
+        { field: 'percent', headerName: 'Percent Change', type: "number", width: 150 },
+    ]
+
     const [stockTable, setStockTable] = useState([]);
-    const [buttonClicked, setButtonClicked] = useState(false);
+    const [stockTableFinished, setStockTableFinished] = useState(false);
 
     const prevData = useLocation();
     const userID = prevData.state.currUsername;
@@ -54,7 +70,7 @@ export default function Dashboard(props) {
     const handleClickOpenAdd = () => {
         setOpen(true);
     };
-    
+
     const handleCloseAdd = () => {
         setOpen(false);
     };
@@ -67,7 +83,7 @@ export default function Dashboard(props) {
     // ]
 
     async function getData() {
-        setButtonClicked(true);
+        //setButtonClicked(true);
         let tempStockTable = [];
         const first = await axios({
             method: "GET",
@@ -115,6 +131,7 @@ export default function Dashboard(props) {
             const percentChangeInd = tempStockTable.findIndex(object => { return object.stock === tempCurrPrices[i][0]; });
             tempStockTable[percentChangeInd].percent = percent.toFixed(2);
             setStockTable(tempStockTable);
+            setStockTableFinished(true);
             // const fourth = await axios({
             //     method: "PUT",
             //     url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
@@ -217,6 +234,10 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
+    useEffect(() => {
+        getData();
+    }, [stockTableFinished]);
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -288,9 +309,9 @@ export default function Dashboard(props) {
                             />
                         </DialogContent>
                         <DialogActions>
-                        <Button onClick={handleCloseAdd}>Cancel</Button>
-                        <Button onClick={handleClick}>Subscribe</Button>
-        </DialogActions>
+                            <Button onClick={handleCloseAdd}>Cancel</Button>
+                            <Button onClick={handleClick}>Subscribe</Button>
+                        </DialogActions>
                     </Dialog>
                 </div>
 
@@ -302,35 +323,50 @@ export default function Dashboard(props) {
                     <p>Username was: {userID}</p>
                     <p>Password was: {userPass}</p>
                     <h2>Stock Portfolio</h2>
-                    <p>To get your stock details: </p><button onClick={getData}>Click me</button>
-                    {buttonClicked && <div>
+                    <p>Wait a few seconds to view stock details.</p>
+                    <div>
                         <div>
-                            <table class="center">
-                                <thead>
-                                    <tr>
-                                        <th>Stock</th>
-                                        <th>Baseline Comparison Date</th>
-                                        <th>Past Price</th>
-                                        <th>Current Price</th>
-                                        <th>Percent Change</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {stockTable.map(item => {
-                                        return (
-                                            <tr key={item.stock}>
-                                                <td>{item.stock}</td>
-                                                <td>{item.freq}</td>
-                                                <td>{item.past}</td>
-                                                <td>{item.curr}</td>
-                                                <td>{item.percent}</td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
+                            {/* <TableContainer component={Paper}>
+                                <Table sx={{ width: 3 / 4 }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Stock</TableCell>
+                                            <TableCell>Baseline Comparison Date</TableCell>
+                                            <TableCell>Past Price</TableCell>
+                                            <TableCell>Current Price</TableCell>
+                                            <TableCell>Percent Change</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {stockTable.map((row) => (
+                                            <TableRow
+                                                key={row.stock}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row">
+                                                    {row.stock}
+                                                </TableCell>
+                                                <TableCell>{row.freq}</TableCell>
+                                                <TableCell>{row.past}</TableCell>
+                                                <TableCell>{row.curr}</TableCell>
+                                                <TableCell>{row.percent}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer> */}
+                            <div style={{ height: 400, width: '100%' }}>
+                                <DataGrid
+                                    getRowId={(row) => row.stock}
+                                    rows={stockTable}
+                                    columns={columns}
+                                    pageSize={5}
+                                    rowsPerPageOptions={[5]}
+                                    checkboxSelection
+                                />
+                            </div>
                         </div>
-                    </div>}
+                    </div>
                     {/* <h2>Stock Portfolio</h2>
                     <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                     {stockData && <div>
@@ -400,7 +436,7 @@ export default function Dashboard(props) {
                         </div>
                     </div>
                     <div>
-                    <h2>Edit Stock Check Interval</h2>                        
+                        <h2>Edit Stock Check Interval</h2>
                         <form>
                             <label>
                                 <p>Stock Whose Check Interval You Want to Change</p>
