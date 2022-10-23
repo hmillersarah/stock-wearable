@@ -5,6 +5,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 import yfinance as yf
 import json
 import aws_controller
+import realtime_alert_threads
 
 api = Flask(__name__)
 
@@ -44,11 +45,16 @@ def create_token():
 @api.route('/add-stock/<userID>/<stockName>/<stockFreq>', methods=["POST"])
 def add_stock(userID, stockName, stockFreq):
     response = aws_controller.add_stock(userID, stockName, stockFreq)
+    realtime_alert_threads.start_thread(userID, stockName, 0, stockFreq) 
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
 def delete_stock(userID, stockName):
     response = aws_controller.delete_stock(userID, stockName)
+    thread = realtime_alert_threads.running.pop((userID, stockName), None)
+    if thread != None:
+        #terminate thread
+        pass
     return response
 
 @api.route('/update-stock/<userID>/<stock>/<newFreq>', methods=["PUT"])
