@@ -6,6 +6,7 @@ DEVICE_ID   = 123456
 
 import paho.mqtt.client as mqtt
 
+prev_message = ""
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
@@ -18,12 +19,21 @@ def on_message(client, userdata, msg):
     if msg.topic == f"{DEVICE_ID}/connect":
 
         message = str(msg.payload.decode("utf-8"))
-        if message == "disconnected":
-            print(f"Device {DEVICE_ID} is disconnected")
-        elif message == "requesting":
-            print("App is requesting device connection")
-        elif message == "connected":
-            print(f"Device {DEVICE_ID} is connected")
+
+        global prev_message
+        if message != prev_message:
+            if message == "disconnected":
+                print(f"Device {DEVICE_ID} is disconnected")
+                prev_message = "disconnected"
+            elif message == "requesting":
+                print("App is requesting device connection")
+                prev_message = "requesting"
+            elif message == "connected":
+                print(f"Device {DEVICE_ID} is connected")
+                prev_message = "connected"
+            elif message == "disconnecting":
+                print(f"Device {DEVICE_ID} is disconnecting")
+                prev_message = "disconnecting"
 
 
 client = mqtt.Client()
