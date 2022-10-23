@@ -5,7 +5,7 @@
 #include "pitches.h"
 
 // Debug flag for Serial printouts
-#define DEBUG true
+#define DEBUG false
 
 // WiFi SSID and Password
 const char* ssid = "BZhu iPhone";
@@ -240,7 +240,7 @@ void loop() {
   if (state == DISCONNECTED) {
     lcd.setCursor(0, 0);
     lcd.print("Disconnected");
-    lcd.setRGB(0, 0, 100);
+    lcd.setRGB(0x52, 0xB2, 0xBF);
   }
   else if (state == CONNECTED) {
     if (connectedSubstate == IDLE) {
