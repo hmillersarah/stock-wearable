@@ -28,6 +28,7 @@ stock_table.put_item(
     Item={
         "userID": userID,
         "stockName": "MSFT",
+        "frequency": "1mo"
     }
 )
 
@@ -35,5 +36,6 @@ stock_table.put_item(
     Item={
         "userID": userID,
         "stockName": "AMZN",
+        "frequency": "3mo"
     }
 )
