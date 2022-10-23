@@ -153,5 +153,23 @@ def display_device_status(userID):
         time.sleep(0.1)
     return str("connected")
 
+@api.route("/device-connect/<deviceID>/<payload>")
+def device_request_connect(deviceID, payload):
+    # payload is either the string "requesting" or "disconnecting" to connect or disconnect to device
+
+    import paho.mqtt.client as mqtt
+
+    MQTT_SERVER = "ec2-54-224-178-151.compute-1.amazonaws.com"
+    MQTT_PORT   = 1883
+
+    client = mqtt.Client()
+    client.connect(MQTT_SERVER, MQTT_PORT, 60)
+
+    # Non-blocking call
+    client.loop_start()
+    client.publish(f"{deviceID}/connect", payload)
+    client.loop_stop()
+
+
 if __name__ == '__main__':
     api.run(threaded=True, port=5000)
