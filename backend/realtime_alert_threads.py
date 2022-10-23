@@ -40,16 +40,17 @@ def track_stock(stock, min_percent_change, interval, alert_int):
     while(1):
         yf_stock = yf.Ticker(stock)
         response_body = yf_stock.history(period=interval)
-        prev_val = float(response_body['Close'].iloc[0])
-        curr_val = float(response_body['Close'].iloc[len(response_body['Close'])-1])
-        percent_change = (curr_val - prev_val)/prev_val * 100
-        print("stock", stock, "percent change", percent_change)
-        if percent_change >= min_percent_change:
-            print(f"{DEVICE_ID}/update")
-            print(f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
-            client.publish(f"{DEVICE_ID}/update", f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
-        elif percent_change <= -1 * min_percent_change:
-            client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{curr_val:.2f},{prev_val:.2f}")
+        if (len(response_body['Close']) > 1):
+            prev_val = float(response_body['Close'].iloc[0])
+            curr_val = float(response_body['Close'].iloc[len(response_body['Close'])-1])
+            percent_change = (curr_val - prev_val)/prev_val * 100
+            print("stock", stock, "percent change", percent_change)
+            if percent_change >= min_percent_change:
+                print(f"{DEVICE_ID}/update")
+                print(f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
+                client.publish(f"{DEVICE_ID}/update", f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
+            elif percent_change <= -1 * min_percent_change:
+                client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{curr_val:.2f},{prev_val:.2f}")
         time.sleep(alert_int)
 
 def start_thread(userid, stock, min_percent_change, interval, alert_int):
