@@ -39,20 +39,28 @@ export default function Login(props) {
 
     return (
         <div class="login-wrapper">
-            <h1>Please Log In</h1>
-            <form>
-                <label>
-                    <p>Username</p>
-                    <input type="text" onChange={e => setUsername(e.target.value)} />
-                </label>
-                <label>
-                    <p>Password</p>
-                    <input type="password" onChange={e => setPassword(e.target.value)} />
-                </label>
-                <div>
-                    <button type="submit" onClick={handleClick}>Submit</button>
+            <div class="container">
+                <div class="frame">
+                    <div class="nav">
+                        <div class="links">
+                            <h1>Please Log In</h1>
+                            <form class="form-signin">
+                                <label>
+                                    <p>Username</p>
+                                    <input class="form-styling" type="text" onChange={e => setUsername(e.target.value)} />
+                                </label>
+                                <label>
+                                    <p>Password</p>
+                                    <input class="form-styling" type="password" onChange={e => setPassword(e.target.value)} />
+                                </label>
+                                <div class="btn-animate">
+                                    <button class="btn-signin" type="submit" onClick={handleClick}>SUBMIT</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     )
 }
