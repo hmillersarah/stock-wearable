@@ -236,13 +236,21 @@ void loop() {
   }
   client.loop();
 
+  // MQTT Publish Topic String Conversion
+  String string1 = DEVICE_ID + "/connect";
+  unsigned int length1 = string1.length();
+  char topic1[length1];
+  string1.toCharArray(topic1, length1 * 8);
+
   // State machine
   if (state == DISCONNECTED) {
+    client.publish(topic1, "disconnected");
     lcd.setCursor(0, 0);
     lcd.print("Disconnected");
     lcd.setRGB(0x52, 0xB2, 0xBF);
   }
   else if (state == CONNECTED) {
+    client.publish(topic1, "connected");
     if (connectedSubstate == IDLE) {
       lcd.setCursor(0, 0);
       lcd.print("Connected    ");
