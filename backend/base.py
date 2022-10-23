@@ -41,9 +41,9 @@ def create_token():
     response = {"access_token":access_token}
     return response
 
-@api.route('/add-stock/<userID>/<stockName>/<stockFreq>', methods=["POST"])
-def add_stock(userID, stockName, stockFreq):
-    response = aws_controller.add_stock(userID, stockName, stockFreq)
+@api.route('/add-stock/<userID>/<stockName>/<stockFreq>/<percentChg>/<alertInt>', methods=["POST"])
+def add_stock(userID, stockName, stockFreq, percentChg, alertInt ):
+    response = aws_controller.add_stock(userID, stockName, stockFreq, percentChg, alertInt)
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
@@ -54,6 +54,11 @@ def delete_stock(userID, stockName):
 @api.route('/update-stock/<userID>/<stock>/<newFreq>', methods=["PUT"])
 def update_stock(userID, stock, newFreq):
     response = aws_controller.update_stock(userID, stock, newFreq)
+    return response
+
+@api.route('/update-alert/<userID>/<stock>/<newAlert>', methods=["PUT"])
+def update_alert(userID, stock, newAlert):
+    response = aws_controller.update_alert(userID, stock, newAlert)
     return response
 
 @api.route('/profile')
