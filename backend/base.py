@@ -134,9 +134,9 @@ def get_items_2(user):
     userStocks = []
     allStocks = aws_controller.get_stonks()["Items"]
     for row in allStocks:
-        print(row['userID'])
+        ##print(row['percentChangeForAlert']['S'])
         if (row['userID']['S'] == user):
-            userStocks.append([row['stockName']['S'], row['frequency']['S']])
+            userStocks.append([row['stockName']['S'], row['frequency']['S'], row['percentChangeForAlert']['S'], row['checkInterval']['S']])
     return userStocks
 
 @api.route("/logout", methods=["POST"])

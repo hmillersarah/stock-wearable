@@ -41,12 +41,15 @@ export default function Dashboard(props) {
 
     const { token, removeToken, setToken } = useToken();
 
+    const [selectionModel, setSelectionModel] = useState();
     const columns = [
         { field: 'stock', headerName: 'Stock', width: 70 },
-        { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 300 },
+        { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 250 },
         { field: 'past', headerName: 'Past Price', type: "number", width: 130 },
         { field: 'curr', headerName: 'Current Price', type: "number", width: 130 },
-        { field: 'percent', headerName: 'Percent Change', type: "number", width: 150 },
+        { field: 'percent', headerName: 'Stock Price Percent Change', type: "number", width: 250 },
+        { field: 'percentChangeForAlert', headerName: 'Percent Change for Alert', type: "number", width: 250 },
+        { field: 'checkInterval', headerName: 'Check Interval', type: "number", width: 200 },
     ]
 
     const [stockTable, setStockTable] = useState([]);
@@ -117,7 +120,6 @@ export default function Dashboard(props) {
     // ]
 
     async function getData() {
-        //setButtonClicked(true);
         let tempStockTable = [];
         const first = await axios({
             method: "GET",
@@ -126,9 +128,10 @@ export default function Dashboard(props) {
             const res = response.data;
             res.access_token && props.setToken(res.access_token);
             for (let i = 0; i < res.length; i++) {
-                tempStockTable.push({ "stock": res[i][0], "freq": res[i][1], "past": 0, "curr": 0, "percent": 0 });
+                tempStockTable.push({ "stock": res[i][0], "freq": res[i][1], "past": 0, "curr": 0, "percent": 0, "percentChangeForAlert": res[i][2], "checkInterval": res[i][3] });
             }
-            console.log(tempStockTable);
+            console.log(res);
+            //console.log(tempStockTable);
             return res;
         });
         let tempPrices = [];
@@ -277,7 +280,7 @@ export default function Dashboard(props) {
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        Wearable Stock Portfolio
+                        No Stocks Left Behind
                     </Typography>
                     {/* <Button color="inherit">Login</Button> */}
                     <Header token={removeToken} />
@@ -555,6 +558,18 @@ export default function Dashboard(props) {
                         </CardActions>
                     </Card>
                 </Grid>
+                <Grid item xs={4}>
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h5">
+                                Wear Your Wearable
+                            </Typography>
+                            <Typography variant="body1"  color="text.secondary">
+                                Remember to wear your wearable to get customized real-time stock portfolio alerts on your wrist so you never miss a stock rise or drop again! 
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
                 </Grid>
 
                 {/* <div>
@@ -577,8 +592,15 @@ export default function Dashboard(props) {
                     </div> */}
 
             </Container>
-            <div className="center">
-                <header>
+            <Container>
+                <Box style={{marginTop: 30, padding: 10, backgroundColor: "#1976d3"}}>
+                <Typography variant="h4" component="div" color="white" sx={{ flexGrow: 1, paddingTop: 5, paddingLeft: 5 }}>
+                    Stock Portfolio
+                </Typography>
+                <Typography variant="body1" color="white" sx={{ paddingLeft: 5 }}>
+                    Please wait a few seconds to view stock details.
+                </Typography>
+                </Box>
                     {/* <p>Username was: {userID}</p>
                     <p>Password was: {userPass}</p> */}
                     {/* <p>Username was: {userID}</p>
@@ -616,16 +638,21 @@ export default function Dashboard(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainer> */}
-                            <div style={{ height: 400, width: '100%' }}>
+                            <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto' }}>
                                 <DataGrid
                                     getRowId={(row) => row.stock}
                                     rows={stockTable}
                                     columns={columns}
                                     pageSize={5}
                                     rowsPerPageOptions={[5]}
-                                    checkboxSelection
+                                // checkboxSelection
+                                // onSelectionModelChange={(newSelection) => {
+                                //     setSelectionModel(newSelection.selectionModel);
+                                // }}
+                                // selectionModel={selectionModel}
                                 />
                             </div>
+                            {/* {selectionModel.map(val => <h1>{val}</h1>)} */}
                         </div>
                     </div>
                     {/* <h2>Stock Portfolio</h2>
@@ -746,8 +773,7 @@ export default function Dashboard(props) {
                         </div>
                     </div> */}
                     {/* <Header token={removeToken} /> */}
-                </header >
-            </div >
+            </Container>
         </Box>
     );
 }
