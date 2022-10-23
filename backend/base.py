@@ -169,7 +169,9 @@ def device_request_connect(userID, payload):
     client.loop_start()
     client.publish(f"{deviceID}/connect", payload)
     client.loop_stop()
-
+    
+    response = jsonify({"msg": "connection control successful"})
+    return response
 
 if __name__ == '__main__':
     api.run(threaded=True, port=5000)
