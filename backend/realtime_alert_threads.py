@@ -20,19 +20,18 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    global is_device_connected
     # This topic is the only one subscribed to but just in case (should be unneeded)
     if msg.topic == f"{DEVICE_ID}/connect":
 
         message = str(msg.payload.decode("utf-8"))
         if message == "disconnected":
             print(f"Device {DEVICE_ID} is disconnected")
-            global is_device_connected
             is_device_connected = False
         elif message == "requesting":
             print("App is requesting device connection")
         elif message == "connected":
             print(f"Device {DEVICE_ID} is connected")
-            global is_device_connected
             is_device_connected = True
 
 
