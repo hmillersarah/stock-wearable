@@ -28,7 +28,8 @@ const String DEVICE_ID = "123456";
 // Hierarchical State Diagram State Names
 enum State {
   DISCONNECTED,
-  CONNECTED
+  CONNECTED,
+  INVALID
 };
 
 enum ConnectedSubstate {
@@ -38,6 +39,7 @@ enum ConnectedSubstate {
 };
 
 static State state = DISCONNECTED;
+static State prevState = INVALID;
 static ConnectedSubstate connectedSubstate = IDLE;
 
 // Global variables for update message parsing
@@ -244,13 +246,24 @@ void loop() {
 
   // State machine
   if (state == DISCONNECTED) {
-    client.publish(topic1, "disconnected");
-    lcd.setCursor(0, 0);
-    lcd.print("Disconnected");
-    lcd.setRGB(0x52, 0xB2, 0xBF);
+    // Only send and display on state entry
+    if (prevState != DISCONNECTED) {
+      client.publish(topic1, "disconnected");
+      lcd.setCursor(0, 0);
+      lcd.print("Disconnected");
+      lcd.setRGB(0x52, 0xB2, 0xBF);
+
+      // Move previous state
+      prevState = DISCONNECTED;
+    }
   }
   else if (state == CONNECTED) {
-    client.publish(topic1, "connected");
+    if (prevState != CONNECTED) {
+      client.publish(topic1, "connected");
+
+      // Move previous state
+      prevState = CONNECTED;
+    }
     if (connectedSubstate == IDLE) {
       lcd.setCursor(0, 0);
       lcd.print("Connected    ");
