@@ -5,7 +5,7 @@
 #include "pitches.h"
 
 // Debug flag for Serial printouts
-#define DEBUG true
+#define DEBUG false
 
 // WiFi SSID and Password
 const char* ssid = "BZhu iPhone";
