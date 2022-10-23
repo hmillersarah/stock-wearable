@@ -279,6 +279,38 @@ export default function Dashboard(props) {
         event.preventDefault();
     }
 
+    async function connectToDevice(event) {
+        await axios({
+            method: "GET",
+            url: `/device-connect/${userID}/requesting`,
+        }).then((response) => {
+            const res = response.data;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
+    }
+
+    async function disconnectFromDevice(event) {
+        await axios({
+            method: "GET",
+            url: `/device-connect/${userID}/disconnecting`,
+        }).then((response) => {
+            const res = response.data;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
+    }
+
     useEffect(() => {
         getData();
     }, [stockTableFinished, connectivityStatus]);
@@ -571,12 +603,20 @@ export default function Dashboard(props) {
                         <Card>
                             <CardContent>
                                 <Typography variant="h5">
-                                    Wear Your Wearable
+                                    Connect to Device
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
-                                    Remember to wear your wearable to get customized real-time stock portfolio alerts on your wrist so you never miss a stock rise or drop again!
+                                    Connect to device or disconnect from it.
                                 </Typography>
                             </CardContent>
+                            <CardActions>
+                                <Button variant="outlined" onClick={connectToDevice}>
+                                    Connect
+                                </Button>
+                                <Button variant="outlined" onClick={disconnectFromDevice}>
+                                    Disconnect
+                                </Button>
+                            </CardActions>
                         </Card>
                     </Grid>
                 </Grid>

@@ -153,10 +153,10 @@ def display_device_status(userID):
         time.sleep(0.1)
     return str("connected")
 
-@api.route("/device-connect/<deviceID>/<payload>")
-def device_request_connect(deviceID, payload):
+@api.route("/device-connect/<userID>/<payload>")
+def device_request_connect(userID, payload):
     # payload is either the string "requesting" or "disconnecting" to connect or disconnect to device
-
+    deviceID = aws_controller.get_device_id(userID)
     import paho.mqtt.client as mqtt
 
     MQTT_SERVER = "ec2-54-224-178-151.compute-1.amazonaws.com"
