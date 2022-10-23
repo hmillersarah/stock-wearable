@@ -38,12 +38,15 @@ export default function Dashboard(props) {
 
     const { token, removeToken, setToken } = useToken();
 
+    const [selectionModel, setSelectionModel] = useState();
     const columns = [
         { field: 'stock', headerName: 'Stock', width: 70 },
         { field: 'freq', headerName: 'Baseline Comparison Date', type: "number", width: 300 },
         { field: 'past', headerName: 'Past Price', type: "number", width: 130 },
         { field: 'curr', headerName: 'Current Price', type: "number", width: 130 },
-        { field: 'percent', headerName: 'Percent Change', type: "number", width: 150 },
+        { field: 'percent', headerName: 'Stock Price Percent Change', type: "number", width: 300 },
+        { field: 'percentChangeForAlert', headerName: 'Percent Change for Alert', type: "number", width: 350 },
+        { field: 'checkInterval', headerName: 'Check Interval', type: "number", width: 250 },
     ]
 
     const [stockTable, setStockTable] = useState([]);
@@ -75,15 +78,7 @@ export default function Dashboard(props) {
         setOpen(false);
     };
 
-    // const columns = [
-    //     {field: 'stock', headerName:'Stock', width: 70},
-    //     {field: 'pastPrice', headerName: 'Past Price', type: "number", width: 130},
-    //     {field: 'currPrice', headerName: 'Current Price', type: "number", width: 130},
-    //     {field: 'percentChg', headerName: 'Percent Change', type: "number", width: 70},
-    // ]
-
     async function getData() {
-        //setButtonClicked(true);
         let tempStockTable = [];
         const first = await axios({
             method: "GET",
@@ -92,9 +87,10 @@ export default function Dashboard(props) {
             const res = response.data;
             res.access_token && props.setToken(res.access_token);
             for (let i = 0; i < res.length; i++) {
-                tempStockTable.push({ "stock": res[i][0], "freq": res[i][1], "past": 0, "curr": 0, "percent": 0 });
+                tempStockTable.push({ "stock": res[i][0], "freq": res[i][1], "past": 0, "curr": 0, "percent": 0, "percentChangeForAlert": res[i][2], "checkInterval": res[i][3] });
             }
-            console.log(tempStockTable);
+            console.log(res);
+            //console.log(tempStockTable);
             return res;
         });
         let tempPrices = [];
@@ -318,10 +314,6 @@ export default function Dashboard(props) {
             </Container>
             <div className="center">
                 <header>
-                    {/* <p>Username was: {userID}</p>
-                    <p>Password was: {userPass}</p> */}
-                    <p>Username was: {userID}</p>
-                    <p>Password was: {userPass}</p>
                     <h2>Stock Portfolio</h2>
                     <p>Wait a few seconds to view stock details.</p>
                     <div>
@@ -363,8 +355,13 @@ export default function Dashboard(props) {
                                     pageSize={5}
                                     rowsPerPageOptions={[5]}
                                     checkboxSelection
+                                    onSelectionModelChange={(newSelection) => {
+                                        setSelectionModel(newSelection.selectionModel);
+                                    }}
+                                    selectionModel={selectionModel}
                                 />
                             </div>
+                            {/* {selectionModel.map(val => <h1>{val}</h1>)} */}
                         </div>
                     </div>
                     {/* <h2>Stock Portfolio</h2>
