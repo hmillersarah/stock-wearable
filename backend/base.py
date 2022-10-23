@@ -49,7 +49,7 @@ def create_token():
 @api.route('/add-stock/<userID>/<stockName>/<stockFreq>/<percentChg>/<alertInt>', methods=["POST"])
 def add_stock(userID, stockName, stockFreq, percentChg, alertInt ):
     response = aws_controller.add_stock(userID, stockName, stockFreq, percentChg, alertInt)
-    realtime_alert_threads.start_thread(userID, stockName, percentChg, stockFreq) 
+    realtime_alert_threads.start_thread(userID, stockName, percentChg, stockFreq, alertInt) 
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
@@ -78,7 +78,7 @@ def update_alert(userID, stock, newAlert):
 
 @api.route('/update-stock-price-percent-change/<userID>/<stock>/<stockPricePercentChange>', methods=["PUT"])
 def update_stock_price_percent_change(userID, stock, stockPricePercentChange):
-    response = aws_controller.update_stock_price_percentChg(userID, stock, stockPricePercentChange)
+    response = aws_controller.update_stock_price_percentChg(userID, stock, stockPricePercentChange=stockPricePercentChange)
     return response
 
 @api.route('/profile')

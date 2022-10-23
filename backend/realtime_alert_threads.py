@@ -30,10 +30,13 @@ def on_message(client, userdata, msg):
         elif message == "connected":
             print(f"Device {DEVICE_ID} is connected")
 
-client = mqtt.Client()
 
 def track_stock(stock, min_percent_change, interval, alert_int):
     print("started thread")
+    client = mqtt.Client()
+    client.connect(MQTT_SERVER, MQTT_PORT, 60)
+    client.loop_start()
+
     while(1):
         yf_stock = yf.Ticker(stock)
         response_body = yf_stock.history(period=interval)
@@ -42,9 +45,11 @@ def track_stock(stock, min_percent_change, interval, alert_int):
         percent_change = (curr_val - prev_val)/prev_val * 100
         print("stock", stock, "percent change", percent_change)
         if percent_change >= min_percent_change:
+            print(f"{DEVICE_ID}/update")
+            print(f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
             client.publish(f"{DEVICE_ID}/update", f"{stock},Up,{curr_val:.2f},{prev_val:.2f}")
-        elif percent_change >= -1 * min_percent_change:
-            client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{curr_val:.2f},{prev_val:2f}")
+        elif percent_change <= -1 * min_percent_change:
+            client.publish(f"{DEVICE_ID}/update", f"{stock},Down,{curr_val:.2f},{prev_val:.2f}")
         time.sleep(alert_int)
 
 def start_thread(userid, stock, min_percent_change, interval, alert_int):
@@ -81,13 +86,14 @@ def update_thread(userid, stock, **kwargs):
         target=track_stock, 
         args=(
             stock, 
-            running_info[(userid, stock)]["min_percent_change"], 
+            float(running_info[(userid, stock)]["min_percent_change"]), 
             running_info[(userid, stock)]["interval"])
     )
     running[(userid, stock)] = new_process
     new_process.start()
     
 def init_all_threads(all_stocks, deviceid):
+    client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
 
