@@ -69,14 +69,52 @@ export default function Dashboard(props) {
     const [stockToDelete, setStockToDelete] = useState();
 
     const [open, setOpen] = React.useState(false);
-
     const handleClickOpenAdd = () => {
         setOpen(true);
     };
-
     const handleCloseAdd = () => {
         setOpen(false);
     };
+
+    const [openDeleteStock, setOpenDeleteStock] = React.useState(false);
+    const handleClickOpenDelete = () => {
+        setOpenDeleteStock(true);
+    };
+    const handleCloseDelete = () => {
+        setOpenDeleteStock(false);
+    };
+
+    const [openEditStockBaseline, setopenEditStockBaseline] = React.useState(false);
+    const handleClickOpenEditStockBaseline = () => {
+        setopenEditStockBaseline(true);
+    };
+    const handleCloseEditStockBaseline = () => {
+        setopenEditStockBaseline(false);
+    };
+
+    const [openEditMinPercentChg, setopenEditMinPercentChg] = React.useState(false);
+    const handleClickOpenEditMinPercentChg = () => {
+        setopenEditMinPercentChg(true);
+    };
+    const handleCloseEditMinPercentChg = () => {
+        setopenEditMinPercentChg(false);
+    };
+
+    const [openEditCheckInt, setopenEditCheckInt] = React.useState(false);
+    const handleClickOpenEditCheckInt = () => {
+        setopenEditCheckInt(true);
+    };
+    const handleCloseEditCheckInt = () => {
+        setopenEditCheckInt(false);
+    };
+
+
+    // const columns = [
+    //     {field: 'stock', headerName:'Stock', width: 70},
+    //     {field: 'pastPrice', headerName: 'Past Price', type: "number", width: 130},
+    //     {field: 'currPrice', headerName: 'Current Price', type: "number", width: 130},
+    //     {field: 'percentChg', headerName: 'Percent Change', type: "number", width: 70},
+    // ]
 
     async function getData() {
         let tempStockTable = [];
@@ -255,7 +293,7 @@ export default function Dashboard(props) {
                 </Grid>
                 <div>
                     <Button variant="outlined" onClick={handleClickOpenAdd}>
-                        Open
+                        Add Stock
                     </Button>
                     <Dialog open={open} onClose={handleCloseAdd}>
                         <DialogTitle>Subscribe to a Stock</DialogTitle>
@@ -310,6 +348,163 @@ export default function Dashboard(props) {
                         </DialogActions>
                     </Dialog>
                 </div>
+                <div>
+                    <Button variant="outlined" onClick={handleClickOpenDelete}>
+                        Delete
+                    </Button>
+                    <Dialog open={openDeleteStock} onClose={handleCloseDelete}>
+                        <DialogTitle>Unfollow Stock</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Please confirm the stock you would like to remove from your portfolio:
+                            </DialogContentText>
+                            <TextField
+                                margin='dense'
+                                id='deleteStock'
+                                label='Stock Name'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                helperText="Re-type the stock you would like to unfollow"
+                                onChange={e => setStockToDelete(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDelete}>Cancel</Button>
+                            <Button onClick={handleDelete}>Unfollow</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+                <div>
+                    <Button variant="outlined" onClick={handleClickOpenEditStockBaseline}>
+                        Edit Baseline Date
+                    </Button>
+                    <Dialog open={openEditStockBaseline} onClose={handleCloseEditStockBaseline}>
+                        <DialogTitle>Edit Baseline Date</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Update the baseline date of your stock
+                            </DialogContentText>
+                            <TextField
+                                margin='dense'
+                                id='baselinePriceStock'
+                                label='Stock Name'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                helperText="Target Stock for New Baseline Comparison Date"
+                                onChange={e => setStockToEdit(e.target.value)}
+                            />
+                            <TextField
+                                margin='dense'
+                                id='baselinePrice'
+                                label='New Baseline Comparison Date'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                helperText="(1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"
+                                onChange={e => setNewFreqAfterEdit(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseEditStockBaseline}>Cancel</Button>
+                            <Button onClick={handleEditFreq}>Edit</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+
+                <div>
+                    <Button variant="outlined" onClick={handleClickOpenEditMinPercentChg}>
+                        Edit Stock Percent Change
+                    </Button>
+                    <Dialog open={openEditMinPercentChg} onClose={handleCloseEditMinPercentChg}>
+                        <DialogTitle>Edit Stock Percent Change</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Update minimum stock percent change needed to warrant alert
+                            </DialogContentText>
+                            <TextField
+                                margin='dense'
+                                id='minPercentChgStock'
+                                label='Stock Name'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                helperText="Target Stock for New Percent Change"
+                                onChange={e => setStockToEdit(e.target.value)}
+                            />
+                            <TextField
+                                margin='dense'
+                                id='minPercentChg'
+                                label='New Minimum Percent Change'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                onChange={e => setNewPercentChangeAfterEdit(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseEditMinPercentChg}>Cancel</Button>
+                            <Button onClick={handleEditPercentChange}>Edit</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+
+                <div>
+                    <Button variant="outlined" onClick={handleClickOpenEditCheckInt}>
+                        Edit Price Change Check Interval
+                    </Button>
+                    <Dialog open={openEditCheckInt} onClose={handleCloseEditCheckInt}>
+                        <DialogTitle>Edit Price Change Check Interval</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Update interval at which stock price changes are checked
+                            </DialogContentText>
+                            <TextField
+                                margin='dense'
+                                id='checkIntStock'
+                                label='Stock Name'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                helperText="Target Stock for New Price Change Check Interval"
+                                onChange={e => setStockToEdit(e.target.value)}
+                            />
+                            <TextField
+                                margin='dense'
+                                id='newCheckInt'
+                                label='New Price Change Check Interval'
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                onChange={e => setNewAlertAfterEdit(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseEditCheckInt}>Cancel</Button>
+                            <Button onClick={handleEditAlert}>Edit</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+
+                {/* <div>
+                        <h2>Edit Stock Alert Interval</h2>
+                        <div>
+                            <form>
+                                <label>
+                                    <p>Stock Whose Alert Interval You Want to Change</p>
+                                    <input type="text" onChange={e => setStockToEdit(e.target.value)} />
+                                </label>
+                                <label>
+                                    <p>New Alert Interval</p>
+                                    <input type="text" onChange={e => setNewAlertAfterEdit(e.target.value)} />
+                                </label>
+                                <div>
+                                    <button type="button" onClick={handleEditAlert}>Edit Alert Interval</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div> */}
 
             </Container>
             <div className="center">
@@ -396,7 +591,7 @@ export default function Dashboard(props) {
                             </div>
                         </form>
                     </div> */}
-                    <div>
+                    {/* <div>
                         <h2>Edit Stock Baseline Comparison Date</h2>
                         <div>
                             <form>
@@ -413,8 +608,8 @@ export default function Dashboard(props) {
                                 </div>
                             </form>
                         </div>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <h2>Edit Stock Minimum Percent Change to Warrant an Alert</h2>
                         <div>
                             <form>
@@ -431,8 +626,8 @@ export default function Dashboard(props) {
                                 </div>
                             </form>
                         </div>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <h2>Edit Stock Check Interval</h2>
                         <form>
                             <label>
@@ -447,7 +642,7 @@ export default function Dashboard(props) {
                                 <button type="button" onClick={handleEditAlert}>Edit Check Interval</button>
                             </div>
                         </form>
-                    </div>
+                    </div> */}
                     <div>
                         <h2>Edit Stock Alert Interval</h2>
                         <div>
@@ -466,7 +661,7 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div>
-
+                    {/* 
                     <div>
                         <h2>Stop Following a Stock</h2>
                         <div>
@@ -480,7 +675,7 @@ export default function Dashboard(props) {
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> */}
                     {/* <Header token={removeToken} /> */}
                 </header >
             </div >
