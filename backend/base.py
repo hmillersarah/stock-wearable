@@ -42,10 +42,10 @@ def create_token():
     response = {"access_token":access_token}
     return response
 
-@api.route('/add-stock/<userID>/<stockName>/<stockFreq>', methods=["POST"])
-def add_stock(userID, stockName, stockFreq):
-    response = aws_controller.add_stock(userID, stockName, stockFreq)
-    realtime_alert_threads.start_thread(userID, stockName, 0, stockFreq) 
+@api.route('/add-stock/<userID>/<stockName>/<stockFreq>/<percentChg>/<alertInt>', methods=["POST"])
+def add_stock(userID, stockName, stockFreq, percentChg, alertInt ):
+    response = aws_controller.add_stock(userID, stockName, stockFreq, percentChg, alertInt)
+    realtime_alert_threads.start_thread(userID, stockName, percentChg, stockFreq) 
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
@@ -60,6 +60,16 @@ def delete_stock(userID, stockName):
 @api.route('/update-stock/<userID>/<stock>/<newFreq>', methods=["PUT"])
 def update_stock(userID, stock, newFreq):
     response = aws_controller.update_stock(userID, stock, newFreq)
+    return response
+
+@api.route('/update-percent-change/<userID>/<stock>/<newPercentChange>', methods=["PUT"])
+def update_percent_change(userID, stock, newPercentChange):
+    response = aws_controller.update_percentChg(userID, stock, newPercentChange)
+    return response
+
+@api.route('/update-alert/<userID>/<stock>/<newAlert>', methods=["PUT"])
+def update_alert(userID, stock, newAlert):
+    response = aws_controller.update_alert(userID, stock, newAlert)
     return response
 
 @api.route('/profile')
