@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 import yfinance as yf
 import json
+import time
 import aws_controller
 import realtime_alert_threads
 
@@ -144,6 +145,12 @@ def logout():
     response = jsonify({"msg": "logout successful"})
     unset_jwt_cookies(response)
     return response
+
+@api.route("/device-status/<deviceID>")
+def display_device_status(deviceID):
+    while realtime_alert_threads.is_device_connected == False or deviceID != realtime_alert_threads.DEVICE_ID:
+        time.sleep(0.1)
+    return str("connected")
 
 if __name__ == '__main__':
     api.run(threaded=True, port=5000)

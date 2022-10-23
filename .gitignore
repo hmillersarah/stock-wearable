@@ -25,3 +25,4 @@ yarn-error.log*
 backend/env
 backend/__pycache__
 frontend/node_modules/.cache/.eslintcache
+frontend/node_modules/.cache/babel-loader/*.json
