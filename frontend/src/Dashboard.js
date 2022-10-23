@@ -88,7 +88,7 @@ export default function Dashboard(props) {
     async function handleClick(event) {
         await axios({
             method: "POST",
-            url: `/add-stock/${userID}/${newStock}/${newFrequency}`,
+            url: `/add-stock/${userID}/${newStock}/${newFrequency}/${newPercentChange}/${newAlert}`,
         }).then((response) => {
             const res = response.data;
             res.access_token && props.setToken(res.access_token);
@@ -124,11 +124,41 @@ export default function Dashboard(props) {
     }
 
     async function handleEditPercentChange(event) {
-        console.log();
+        await axios({
+            method: "PUT",
+            url: `/update-percent-change/${userID}/${stockToEdit}/${newPercentChangeAfterEdit}`,
+        }).then((response) => {
+            const res = response.data;
+            res.access_token && props.setToken(res.access_token);
+            window.confirm('Percent change has been updated!');
+            window.location.reload();
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
     }
 
     async function handleEditAlert(event) {
-        console.log();
+        await axios({
+            method: "PUT",
+            url: `/update-alert/${userID}/${stockToEdit}/${newAlertAfterEdit}`,
+        }).then((response) => {
+            const res = response.data;
+            res.access_token && props.setToken(res.access_token);
+            window.confirm('Alert has been updated!');
+            window.location.reload();
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        event.preventDefault();
     }
 
     async function handleDelete(event) {

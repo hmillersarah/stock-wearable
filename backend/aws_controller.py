@@ -43,6 +43,18 @@ def update_stock(user, stock, newFreq):
     )
     return response
 
+def update_percentChg(user, stock, newPercentChg):
+    response = dynamo_resource.update_item(
+        Key={
+            "userID": user,
+            "stockName": stock,
+        },
+        UpdateExpression="set percentChange = :percentChange",
+        ExpressionAttributeValues = {":percentChange": newPercentChg},
+        ReturnValues = "UPDATED_NEW"
+    )
+    return response
+
 def update_alert(user, stock, newAlert):
     response = dynamo_resource.update_item(
         Key={

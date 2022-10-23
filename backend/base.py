@@ -56,6 +56,11 @@ def update_stock(userID, stock, newFreq):
     response = aws_controller.update_stock(userID, stock, newFreq)
     return response
 
+@api.route('/update-percent-change/<userID>/<stock>/<newPercentChange>', methods=["PUT"])
+def update_percent_change(userID, stock, newPercentChange):
+    response = aws_controller.update_percentChg(userID, stock, newPercentChange)
+    return response
+
 @api.route('/update-alert/<userID>/<stock>/<newAlert>', methods=["PUT"])
 def update_alert(userID, stock, newAlert):
     response = aws_controller.update_alert(userID, stock, newAlert)
