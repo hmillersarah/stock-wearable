@@ -146,8 +146,9 @@ def logout():
     unset_jwt_cookies(response)
     return response
 
-@api.route("/device-status/<deviceID>")
-def display_device_status(deviceID):
+@api.route("/device-status/<userID>")
+def display_device_status(userID):
+    deviceID = aws_controller.get_device_id(userID)
     while realtime_alert_threads.is_device_connected == False or deviceID != realtime_alert_threads.DEVICE_ID:
         time.sleep(0.1)
     return str("connected")
