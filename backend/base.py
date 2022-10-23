@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
 from datetime import datetime, timedelta, timezone
+
+from numpy import real
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 import yfinance as yf
 import json
 import aws_controller
+import realtime_alert_threads
 
 api = Flask(__name__)
 
@@ -37,6 +40,8 @@ def create_token():
     if email != "test_user" or password != "test":
         return {"msg": "Wrong email or password"}, 401
 
+    realtime_alert_threads.init_all_threads(aws_controller.get_stocks(email)["Items"], aws_controller.get_device_id(email))
+
     access_token = create_access_token(identity=email)
     response = {"access_token":access_token}
     return response
@@ -44,31 +49,36 @@ def create_token():
 @api.route('/add-stock/<userID>/<stockName>/<stockFreq>/<percentChg>/<alertInt>', methods=["POST"])
 def add_stock(userID, stockName, stockFreq, percentChg, alertInt ):
     response = aws_controller.add_stock(userID, stockName, stockFreq, percentChg, alertInt)
+    realtime_alert_threads.start_thread(userID, stockName, percentChg, stockFreq, alertInt) 
     return response
 
 @api.route('/delete-stock/<userID>/<stockName>', methods=["DELETE"])
 def delete_stock(userID, stockName):
     response = aws_controller.delete_stock(userID, stockName)
+    realtime_alert_threads.terminate_thread(userID, stockName)
     return response
 
 @api.route('/update-stock/<userID>/<stock>/<newFreq>', methods=["PUT"])
 def update_stock(userID, stock, newFreq):
     response = aws_controller.update_stock(userID, stock, newFreq)
+    realtime_alert_threads.update_thread(userID, stock, newFreq=newFreq)
     return response
 
 @api.route('/update-percent-change/<userID>/<stock>/<newPercentChange>', methods=["PUT"])
 def update_percent_change(userID, stock, newPercentChange):
     response = aws_controller.update_percentChg(userID, stock, newPercentChange)
+    realtime_alert_threads.update_thread(userID, stock, newPercentChange=newPercentChange)
     return response
 
 @api.route('/update-alert/<userID>/<stock>/<newAlert>', methods=["PUT"])
 def update_alert(userID, stock, newAlert):
     response = aws_controller.update_alert(userID, stock, newAlert)
+    realtime_alert_threads.update_thread(userID, stock, newAlert=newAlert)
     return response
 
 @api.route('/update-stock-price-percent-change/<userID>/<stock>/<stockPricePercentChange>', methods=["PUT"])
 def update_stock_price_percent_change(userID, stock, stockPricePercentChange):
-    response = aws_controller.update_stock_price_percentChg(userID, stock, stockPricePercentChange)
+    response = aws_controller.update_stock_price_percentChg(userID, stock, stockPricePercentChange=stockPricePercentChange)
     return response
 
 @api.route('/profile')
