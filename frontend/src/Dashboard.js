@@ -10,10 +10,9 @@ export default function Dashboard(props) {
     const navigate = useNavigate();
 
     const { token, removeToken, setToken } = useToken();
-    const [stockData, setStockData] = useState(null);
-    const [stockPrice, setStockPrice] = useState([]);
-    const [currStockPrice, setCurrStockPrice] = useState([]);
-    const [priceChange, setPriceChange] = useState();
+
+    const [stockTable, setStockTable] = useState([]);
+    const [buttonClicked, setButtonClicked] = useState(false);
 
     const prevData = useLocation();
     const userID = prevData.state.currUsername;
@@ -32,24 +31,22 @@ export default function Dashboard(props) {
     const [stockToDelete, setStockToDelete] = useState();
 
     async function getData() {
+        setButtonClicked(true);
+        let tempStockTable = [];
         const first = await axios({
             method: "GET",
             url: `/get-stocks/${userID}`,
         }).then((response) => {
             const res = response.data;
             res.access_token && props.setToken(res.access_token);
-            let sentence = '';
             for (let i = 0; i < res.length; i++) {
-                sentence = sentence + res[i][0] + ' ' + res[i][1] + ' ';
+                tempStockTable.push({ "stock": res[i][0], "freq": res[i][1], "past": 0, "curr": 0, "percent": 0 });
             }
-            setStockData((sentence));
-            console.log(res);
+            console.log(tempStockTable);
             return res;
         });
         let tempPrices = [];
-        let tempPriceSentence = '';
         let tempCurrPrices = [];
-        let tempCurrPriceSentence = '';
         for (let i = 0; i < first.length; i++) {
             let currStock = first[i][0];
             let currFreq = first[i][1];
@@ -60,7 +57,8 @@ export default function Dashboard(props) {
                 const res = response.data;
                 res.access_token && props.setToken(res.access_token);
                 tempPrices.push([currStock, res.toFixed(2)]);
-                tempPriceSentence += currStock + ': ' + res.toFixed(2) + ' ';
+                const pastInd = tempStockTable.findIndex(object => { return object.stock === currStock; });
+                tempStockTable[pastInd].past = res.toFixed(2);
             });
             const third = await axios({
                 method: "GET",
@@ -69,24 +67,23 @@ export default function Dashboard(props) {
                 const res = response.data;
                 res.access_token && props.setToken(res.access_token);
                 tempCurrPrices.push([currStock, res.toFixed(2)]);
-                tempCurrPriceSentence += currStock + ': ' + res.toFixed(2) + ' ';
+                const currInd = tempStockTable.findIndex(object => { return object.stock === currStock; });
+                tempStockTable[currInd].curr = res.toFixed(2);
             });
         }
-        //console.log(tempPrices);
-        setStockPrice(tempPriceSentence);
-        setCurrStockPrice(tempCurrPriceSentence);
         let tempPriceChange = [];
-        let tempPriceChangeSentence = '';
         for (let i = 0; i < tempCurrPrices.length; i++) {
             let percent = (tempCurrPrices[i][1] - tempPrices[i][1]) / tempPrices[i][1] * 100;
             tempPriceChange.push([tempCurrPrices[i][0], percent.toFixed(2)]);
-            tempPriceChangeSentence += tempCurrPrices[i][0] + ': ' + percent.toFixed(2) + ' ';
-            const fourth = await axios({
-                method: "PUT",
-                url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
-            });
+
+            const percentChangeInd = tempStockTable.findIndex(object => { return object.stock === tempCurrPrices[i][0]; });
+            tempStockTable[percentChangeInd].percent = percent.toFixed(2);
+            setStockTable(tempStockTable);
+            // const fourth = await axios({
+            //     method: "PUT",
+            //     url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
+            // });
         }
-        setPriceChange(tempPriceChangeSentence);
     }
 
     async function handleClick(event) {
@@ -191,11 +188,33 @@ export default function Dashboard(props) {
                 <p>Password was: {userPass}</p>
                 <h2>Stock Portfolio</h2>
                 <p>To get your stock details: </p><button onClick={getData}>Click me</button>
-                {stockData && <div>
-                    <p>Stocks for {userID}: {stockData}</p>
-                    <p>Past stock price: {stockPrice}</p>
-                    <p>Current stock price: {currStockPrice}</p>
-                    <p>Percent change: {priceChange}</p>
+                {buttonClicked && <div>
+                    <div>
+                        <table class="center">
+                            <thead>
+                                <tr>
+                                    <th>Stock</th>
+                                    <th>Baseline Comparison Date</th>
+                                    <th>Past Price</th>
+                                    <th>Current Price</th>
+                                    <th>Percent Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stockTable.map(item => {
+                                    return (
+                                        <tr key={item.stock}>
+                                            <td>{item.stock}</td>
+                                            <td>{item.freq}</td>
+                                            <td>{item.past}</td>
+                                            <td>{item.curr}</td>
+                                            <td>{item.percent}</td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>}
                 <div>
                     <h2>Add Another Stock to Follow</h2>
@@ -258,19 +277,19 @@ export default function Dashboard(props) {
                     </div>
                 </div>
                 <div>
-                    <h2>Edit Stock Alert Interval</h2>
+                    <h2>Edit Stock Check Interval</h2>
                     <div>
                         <form>
                             <label>
-                                <p>Stock Whose Alert Interval You Want to Change</p>
+                                <p>Stock Whose Check Interval You Want to Change</p>
                                 <input type="text" onChange={e => setStockToEdit(e.target.value)} />
                             </label>
                             <label>
-                                <p>New Alert Interval</p>
+                                <p>New Check Interval</p>
                                 <input type="text" onChange={e => setNewAlertAfterEdit(e.target.value)} />
                             </label>
                             <div>
-                                <button type="button" onClick={handleEditAlert}>Edit Alert Interval</button>
+                                <button type="button" onClick={handleEditAlert}>Edit Check Interval</button>
                             </div>
                         </form>
                     </div>
