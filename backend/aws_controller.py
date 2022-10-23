@@ -1,4 +1,6 @@
 import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
 
 dynamo_client = boto3.client('dynamodb')
 dynamo_resource = boto3.resource('dynamodb').Table('HackGT9UserStocks')
@@ -9,6 +11,17 @@ def get_user():
 def get_stocks():
     # return boto3.client('dynamodb').list_tables()
     return dynamo_client.scan(TableName='HackGT9UserStocks')
+
+def get_stocks(userid):
+    # return boto3.client('dynamodb').list_tables()
+    return dynamo_client.scan(TableName='HackGT9UserStocks', FilterExpression=Attr('userID').eq(str(userid)))
+
+def get_device_id(userid):
+    table = dynamo_client.Table('HackGT9UserMetadata')
+    response = table.scan(
+        FilterExpression=Attr('userID').eq(str(userid))
+    )
+    return response["Items"][0]["deviceID"]["S"]
 
 def add_stock(user, stock, frequency, percentChg, checkInt):
     response = dynamo_resource.put_item(
