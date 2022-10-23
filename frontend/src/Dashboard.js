@@ -592,7 +592,7 @@ export default function Dashboard(props) {
                     </div> */}
 
             </Container>
-            <Container>
+            <Container >
                 <Box style={{marginTop: 30, padding: 10, backgroundColor: "#1976d3"}}>
                 <Typography variant="h4" component="div" color="white" sx={{ flexGrow: 1, paddingTop: 5, paddingLeft: 5 }}>
                     Stock Portfolio
@@ -638,7 +638,7 @@ export default function Dashboard(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainer> */}
-                            <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto' }}>
+                            <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto', backgroundColor: "white" }}>
                                 <DataGrid
                                     getRowId={(row) => row.stock}
                                     rows={stockTable}
