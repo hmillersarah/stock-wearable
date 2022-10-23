@@ -108,6 +108,7 @@ def init_all_threads(all_stocks, deviceid):
     DEVICE_ID = deviceid
 
     client.connect(MQTT_SERVER, MQTT_PORT, 60)
+    client.loop_start()
     for row in all_stocks:
         print(row)
         start_thread(

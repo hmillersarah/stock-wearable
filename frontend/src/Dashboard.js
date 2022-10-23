@@ -342,8 +342,10 @@ export default function Dashboard(props) {
                     <Typography variant="h2">
                         Welcome, {userID}
                     </Typography>
+                    <Typography variant="h5">
+                        Connection Status: {connectivityStatus}
+                    </Typography>
                 </Grid>
-                <h3>Connection Status: {connectivityStatus}</h3>
                 <Grid
                     container
                     spacing={2}
@@ -615,7 +617,7 @@ export default function Dashboard(props) {
                                     Connect to Device
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
-                                    Connect to device or disconnect from it.
+                                    Connect or disconnect from your wearable device
                                 </Typography>
                             </CardContent>
                             <CardActions>
@@ -696,7 +698,7 @@ export default function Dashboard(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainer> */}
-                        <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto' }}>
+                        <div style={{ height: 400, width: '100%', padding: 10, overflow: 'auto', backgroundColor: "white" }}>
                             <DataGrid
                                 getRowId={(row) => row.stock}
                                 rows={stockTable}
