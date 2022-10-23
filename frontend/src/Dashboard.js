@@ -21,9 +21,13 @@ export default function Dashboard(props) {
 
     const [newStock, setNewStock] = useState();
     const [newFrequency, setNewFrequency] = useState();
+    const [newPercentChange, setNewPercentChange] = useState();
+    const [newAlert, setNewAlert] = useState();
 
-    const [stockWhoseFreqToEdit, setStockWhoseFreqToEdit] = useState();
+    const [stockToEdit, setStockToEdit] = useState();
     const [newFreqAfterEdit, setNewFreqAfterEdit] = useState();
+    const [newPercentChangeAfterEdit, setNewPercentChangeAfterEdit] = useState();
+    const [newAlertAfterEdit, setNewAlertAfterEdit] = useState();
 
     const [stockToDelete, setStockToDelete] = useState();
 
@@ -103,7 +107,7 @@ export default function Dashboard(props) {
     async function handleEditFreq(event) {
         await axios({
             method: "PUT",
-            url: `/update-stock/${userID}/${stockWhoseFreqToEdit}/${newFreqAfterEdit}`,
+            url: `/update-stock/${userID}/${stockToEdit}/${newFreqAfterEdit}`,
         }).then((response) => {
             const res = response.data;
             res.access_token && props.setToken(res.access_token);
@@ -117,6 +121,14 @@ export default function Dashboard(props) {
             }
         });
         event.preventDefault();
+    }
+
+    async function handleEditPercentChange(event) {
+        console.log();
+    }
+
+    async function handleEditAlert(event) {
+        console.log();
     }
 
     async function handleDelete(event) {
@@ -155,12 +167,20 @@ export default function Dashboard(props) {
                     <h2>Add Another Stock to Follow</h2>
                     <form>
                         <label>
-                            <p>Stock Name (4 Letter Abbreviation)</p>
+                            <p>Stock Name (Official Abbreviation)</p>
                             <input type="text" onChange={e => setNewStock(e.target.value)} />
                         </label>
                         <label>
-                            <p>Frequency (1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max)</p>
+                            <p>Baseline Comparison Date (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)</p>
                             <input type="text" onChange={e => setNewFrequency(e.target.value)} />
+                        </label>
+                        <label>
+                            <p>Minimum Percent Change to Warrant an Alert</p>
+                            <input type="text" onChange={e => setNewPercentChange(e.target.value)} />
+                        </label>
+                        <label>
+                            <p>Alert Interval (seconds)</p>
+                            <input type="text" onChange={e => setNewAlert(e.target.value)} />
                         </label>
                         <div>
                             <button type="button" onClick={handleClick}>Add Stock</button>
@@ -168,19 +188,55 @@ export default function Dashboard(props) {
                     </form>
                 </div>
                 <div>
-                    <h2>Edit Stock Frequency</h2>
+                    <h2>Edit Stock Baseline Comparison Date</h2>
                     <div>
                         <form>
                             <label>
-                                <p>Stock Whose Frequency You Want to Change</p>
-                                <input type="text" onChange={e => setStockWhoseFreqToEdit(e.target.value)} />
+                                <p>Stock Whose Baseline Comparison Date You Want to Change</p>
+                                <input type="text" onChange={e => setStockToEdit(e.target.value)} />
                             </label>
                             <label>
-                                <p>New Frequency</p>
+                                <p>New Baseline Comparison Date</p>
                                 <input type="text" onChange={e => setNewFreqAfterEdit(e.target.value)} />
                             </label>
                             <div>
-                                <button type="button" onClick={handleEditFreq}>Edit Frequency</button>
+                                <button type="button" onClick={handleEditFreq}>Edit Baseline Comparison Date</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <h2>Edit Stock Minimum Percent Change to Warrant an Alert</h2>
+                    <div>
+                        <form>
+                            <label>
+                                <p>Stock Whose Minimum Percent Change to Warrant an Alert You Want to Change</p>
+                                <input type="text" onChange={e => setStockToEdit(e.target.value)} />
+                            </label>
+                            <label>
+                                <p>New Minimum Percent Change to Warrant an Alert</p>
+                                <input type="text" onChange={e => setNewPercentChangeAfterEdit(e.target.value)} />
+                            </label>
+                            <div>
+                                <button type="button" onClick={handleEditPercentChange}>Edit Percent Change to Warrant Alert</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <h2>Edit Stock Alert Interval</h2>
+                    <div>
+                        <form>
+                            <label>
+                                <p>Stock Whose Alert Interval You Want to Change</p>
+                                <input type="text" onChange={e => setStockToEdit(e.target.value)} />
+                            </label>
+                            <label>
+                                <p>New Alert Interval</p>
+                                <input type="text" onChange={e => setNewAlertAfterEdit(e.target.value)} />
+                            </label>
+                            <div>
+                                <button type="button" onClick={handleEditAlert}>Edit Alert Interval</button>
                             </div>
                         </form>
                     </div>
