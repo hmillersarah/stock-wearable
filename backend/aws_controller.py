@@ -10,14 +10,15 @@ def get_stocks():
     # return boto3.client('dynamodb').list_tables()
     return dynamo_client.scan(TableName='HackGT9UserStocks')
 
-def add_stock(user, stock, frequency, percentChg, alertInt):
+def add_stock(user, stock, frequency, percentChg, checkInt):
     response = dynamo_resource.put_item(
         Item={
             "userID": user,
             "stockName": stock,
             "frequency": frequency,
-            "percentChange": percentChg,
-            "alertInterval": alertInt
+            "percentChangeForAlert": percentChg,
+            "checkInterval": checkInt,
+            "stockPricePercentChange": 0
         }
     )
     return response
@@ -49,8 +50,20 @@ def update_percentChg(user, stock, newPercentChg):
             "userID": user,
             "stockName": stock,
         },
-        UpdateExpression="set percentChange = :percentChange",
-        ExpressionAttributeValues = {":percentChange": newPercentChg},
+        UpdateExpression="set percentChangeForAlert = :percentChangeForAlert",
+        ExpressionAttributeValues = {":percentChangeForAlert": newPercentChg},
+        ReturnValues = "UPDATED_NEW"
+    )
+    return response
+
+def update_stock_price_percentChg(user, stock, newStockPricePercentChg):
+    response = dynamo_resource.update_item(
+        Key={
+            "userID": user,
+            "stockName": stock,
+        },
+        UpdateExpression="set stockPricePercentChange = :stockPricePercentChange",
+        ExpressionAttributeValues = {":stockPricePercentChange": newStockPricePercentChg},
         ReturnValues = "UPDATED_NEW"
     )
     return response
@@ -61,8 +74,8 @@ def update_alert(user, stock, newAlert):
             "userID": user,
             "stockName": stock,
         },
-        UpdateExpression="set alertInterval = :alertInterval",
-        ExpressionAttributeValues = {":alertInterval": newAlert},
+        UpdateExpression="set checkInterval = :checkInterval",
+        ExpressionAttributeValues = {":checkInterval": newAlert},
         ReturnValues = "UPDATED_NEW"
     )
     return response

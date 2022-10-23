@@ -66,6 +66,11 @@ def update_alert(userID, stock, newAlert):
     response = aws_controller.update_alert(userID, stock, newAlert)
     return response
 
+@api.route('/update-stock-price-percent-change/<userID>/<stock>/<stockPricePercentChange>', methods=["PUT"])
+def update_stock_price_percent_change(userID, stock, stockPricePercentChange):
+    response = aws_controller.update_stock_price_percentChg(userID, stock, stockPricePercentChange)
+    return response
+
 @api.route('/profile')
 @jwt_required() 
 def my_profile():
