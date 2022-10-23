@@ -132,7 +132,7 @@ def get_items():
 @api.route('/get-stocks/<user>')
 def get_items_2(user):
     userStocks = []
-    allStocks = aws_controller.get_stocks()["Items"]
+    allStocks = aws_controller.get_stonks()["Items"]
     for row in allStocks:
         print(row['userID'])
         if (row['userID']['S'] == user):

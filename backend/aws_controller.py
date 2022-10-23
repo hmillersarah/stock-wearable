@@ -19,7 +19,7 @@ dynamo_resource = boto3.resource('dynamodb', aws_access_key_id=AWS_ACCESS_KEY,
 def get_user():
     return dynamo_client.scan(TableName='HackGT9UserMetadata')
 
-def get_stocks():
+def get_stonks():
     # return boto3.client('dynamodb').list_tables()
     return dynamo_client.scan(TableName='HackGT9UserStocks')
 
