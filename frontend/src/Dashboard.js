@@ -218,40 +218,24 @@ export default function Dashboard(props) {
     }
 
     return (
-        <div className="center">
-            <header>
-                <p>Username was: {userID}</p>
-                <p>Password was: {userPass}</p>
-                <h2>Stock Portfolio</h2>
-                <p>To get your stock details: </p><button onClick={getData}>Click me</button>
-                {buttonClicked && <div>
-                    <div>
-                        <table class="center">
-                            <thead>
-                                <tr>
-                                    <th>Stock</th>
-                                    <th>Baseline Comparison Date</th>
-                                    <th>Past Price</th>
-                                    <th>Current Price</th>
-                                    <th>Percent Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stockTable.map(item => {
-                                    return (
-                                        <tr key={item.stock}>
-                                            <td>{item.stock}</td>
-                                            <td>{item.freq}</td>
-                                            <td>{item.past}</td>
-                                            <td>{item.curr}</td>
-                                            <td>{item.percent}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>}
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        Wearable Stock Portfolio
+                    </Typography>
+                    {/* <Button color="inherit">Login</Button> */}
+                    <Header token={removeToken} />
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth="lg">
+                <Grid item xs={8} sx={{
+                    padding: 5
+                }}>
+                    <Typography variant="h2">
+                        Welcome, {userID}
+                    </Typography>
+                </Grid>
                 <div>
                     <Button variant="outlined" onClick={handleClickOpenAdd}>
                         Open
@@ -315,14 +299,46 @@ export default function Dashboard(props) {
                 <header>
                     {/* <p>Username was: {userID}</p>
                     <p>Password was: {userPass}</p> */}
+                    <p>Username was: {userID}</p>
+                    <p>Password was: {userPass}</p>
                     <h2>Stock Portfolio</h2>
+                    <p>To get your stock details: </p><button onClick={getData}>Click me</button>
+                    {buttonClicked && <div>
+                        <div>
+                            <table class="center">
+                                <thead>
+                                    <tr>
+                                        <th>Stock</th>
+                                        <th>Baseline Comparison Date</th>
+                                        <th>Past Price</th>
+                                        <th>Current Price</th>
+                                        <th>Percent Change</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {stockTable.map(item => {
+                                        return (
+                                            <tr key={item.stock}>
+                                                <td>{item.stock}</td>
+                                                <td>{item.freq}</td>
+                                                <td>{item.past}</td>
+                                                <td>{item.curr}</td>
+                                                <td>{item.percent}</td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>}
+                    {/* <h2>Stock Portfolio</h2>
                     <p>To get your stock details: </p><button onClick={getData}>Click me</button>
                     {stockData && <div>
                         <p>Stocks for {userID}: {stockData}</p>
                         <p>Past stock price: {stockPrice}</p>
                         <p>Current stock price: {currStockPrice}</p>
                         <p>Percent change: {priceChange}</p>
-                    </div>}
+                    </div>} */}
                     {/* <div>
                         <h2>Add Another Stock to Follow</h2>
                         <form>
@@ -383,10 +399,8 @@ export default function Dashboard(props) {
                             </form>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <h2>Edit Stock Check Interval</h2>
                     <div>
+                    <h2>Edit Stock Check Interval</h2>                        
                         <form>
                             <label>
                                 <p>Stock Whose Check Interval You Want to Change</p>
@@ -401,6 +415,25 @@ export default function Dashboard(props) {
                             </div>
                         </form>
                     </div>
+                    <div>
+                        <h2>Edit Stock Alert Interval</h2>
+                        <div>
+                            <form>
+                                <label>
+                                    <p>Stock Whose Alert Interval You Want to Change</p>
+                                    <input type="text" onChange={e => setStockToEdit(e.target.value)} />
+                                </label>
+                                <label>
+                                    <p>New Alert Interval</p>
+                                    <input type="text" onChange={e => setNewAlertAfterEdit(e.target.value)} />
+                                </label>
+                                <div>
+                                    <button type="button" onClick={handleEditAlert}>Edit Alert Interval</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <div>
                         <h2>Stop Following a Stock</h2>
                         <div>
