@@ -126,7 +126,7 @@ def marketCustom(stockName, freq):
 
 @api.route('/get-stocks')
 def get_items():
-    return jsonify(aws_controller.get_stocks()["Items"])
+    return jsonify(aws_controller.get_stonks()["Items"])
     # return jsonify(aws_controller.get_user()["Items"])
 
 @api.route('/get-stocks/<user>')
