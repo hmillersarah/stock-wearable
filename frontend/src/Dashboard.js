@@ -175,13 +175,14 @@ export default function Dashboard(props) {
             //     url: `/update-stock-price-percent-change/${userID}/${tempCurrPrices[i][0]}/${percent.toFixed(3)}`
             // });
         }
-        await axios({
-            method: "GET",
-            url: `device-status/${userID}`,
-        }).then((response) => {
-            const res = response.data;
-            setConnectivityStatus(res);
-        });
+        // await axios({
+        //     method: "GET",
+        //     url: `/device-status/${userID}`,
+        // }).then((response) => {
+        //     const res = response.data;
+        //     console.log(res);
+        //     setConnectivityStatus(res);
+        // });
     }
 
     async function handleClick(event) {
@@ -280,7 +281,7 @@ export default function Dashboard(props) {
     }
 
     async function connectToDevice(event) {
-        await axios({
+        const first = await axios({
             method: "GET",
             url: `/device-connect/${userID}/requesting`,
         }).then((response) => {
@@ -291,6 +292,14 @@ export default function Dashboard(props) {
                 console.log(error.response.status);
                 console.log(error.response.headers);
             }
+        });
+        await axios({
+            method: "GET",
+            url: `/device-status/${userID}`,
+        }).then((response) => {
+            const res = response.data;
+            console.log(res);
+            setConnectivityStatus(res);
         });
         event.preventDefault();
     }
